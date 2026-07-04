@@ -61,7 +61,7 @@ Seed sources (M1):
 
 **Fetchers** — one per source type, all emitting `Item{id, title, url, source, published, excerpt}`:
 - **RSS/Atom**: `feedparser`. Covers blogs and GitHub release feeds (`/releases.atom`); an optional per-feed `categories` filter narrows single-feed sites to curated sections.
-- **Sitemap (RSS-less sites)**: discover URLs via the site's `sitemap.xml` (`requests`; filter by `path_prefix`, window by `lastmod`), then fetch each candidate page with the `markfetch` CLI (markdown on stdout, `[code]` on stderr, non-zero exit). The on-page publish date wins over `lastmod` (modified ≠ published); the same fetch yields the excerpt.
+- **Sitemap (RSS-less sites)**: discover URLs via the site's `sitemap.xml` (`requests`; filter by `path_prefix`, shortlist by `lastmod`), then fetch each candidate page with the `markfetch` CLI (markdown on stdout, `[code]` on stderr, non-zero exit). `lastmod` never dates an item (modified ≠ published — a redeploy bumps it sitewide): the item's date comes from the page itself (h1-adjacent date in the raw HTML, else the extracted markdown), and pages without one are dropped.
 - **X (best-effort, M3)**: Nitter-compatible RSS, instance list in config (`xcancel.com` direct + `twiiit.com` redirect discovery), custom User-Agent, per-account tolerance for failure. Adapter interface so a paid API slots in without pipeline changes.
 - **Reddit (M3)**: official OAuth API, free "script" app, plain `requests` against `/r/X/new`.
 - **HN**: Algolia HN Search API — free, no auth, keyword + `created_at_i` week window.
