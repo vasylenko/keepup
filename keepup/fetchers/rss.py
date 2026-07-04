@@ -19,11 +19,13 @@ def _clean(text: str, limit: int = 500) -> str:
     return " ".join(html.unescape(_TAGS.sub(" ", text)).split())[:limit]
 
 
-def fetch_feed(url: str, since: datetime) -> list[Item]:
+def fetch_feed(url: str, since: datetime, categories: list[str] | None = None) -> list[Item]:
     """Fetch one feed and return items published inside the window.
 
     Fetched via requests (feedparser has no timeout control), then parsed
     from bytes. Undated entries are dropped — the week window is the product.
+    `categories` narrows firehose feeds (e.g. OpenAI's single rss.xml) to the
+    curated sections; entries carry them as <category> tags.
     """
     resp = requests.get(url, headers={"User-Agent": CHROME_UA}, timeout=TIMEOUT)
     resp.raise_for_status()
@@ -40,6 +42,10 @@ def fetch_feed(url: str, since: datetime) -> list[Item]:
         published = datetime(*stamp[:6], tzinfo=UTC)
         if published < since:
             continue
+        if categories:
+            entry_categories = {tag.get("term") for tag in entry.get("tags", [])}
+            if not entry_categories & set(categories):
+                continue
         items.append(
             make_item(
                 title=entry.get("title", "(untitled)"),

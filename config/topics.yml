@@ -6,10 +6,14 @@ topics:
   - name: AI/LLM tooling
     feeds:
       - url: https://openai.com/news/rss.xml
-    sitemaps:
-      - url: https://www.anthropic.com/sitemap.xml # Anthropic has no RSS
+        # openai.com/news/engineering + /news/product-releases; the feed
+        # labels those sections Engineering and Product
+        categories: [Engineering, Product]
+    sitemaps: # Anthropic has no RSS
+      - url: https://www.anthropic.com/sitemap.xml
         path_prefix: /news/
-    hn_keywords: [claude, "claude code", mcp, openai, gemini]
+      - url: https://www.anthropic.com/sitemap.xml
+        path_prefix: /engineering/
 
   - name: Cloud & IaC
     feeds:

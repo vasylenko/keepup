@@ -17,11 +17,11 @@ def fetch_topic(topic: Topic, since: datetime) -> tuple[list[Item], list[str]]:
     items: list[Item] = []
     failed: list[str] = []
 
-    for feed_url in topic.feeds:
+    for feed in topic.feeds:
         try:
-            items += rss.fetch_feed(feed_url, since)
+            items += rss.fetch_feed(feed.url, since, feed.categories)
         except Exception as exc:
-            failed.append(f"{urlsplit(feed_url).netloc} ({exc.__class__.__name__})")
+            failed.append(f"{urlsplit(feed.url).netloc} ({exc.__class__.__name__})")
 
     for source in topic.sitemaps:
         try:
