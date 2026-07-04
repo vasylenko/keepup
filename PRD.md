@@ -41,23 +41,26 @@ topics:
   - name: AI/LLM tooling
     feeds:
       - url: https://openai.com/news/rss.xml
+        categories: [Engineering, Product]   # narrows a firehose feed to curated sections
     sitemaps:
       - url: https://www.anthropic.com/sitemap.xml   # Anthropic has no RSS
         path_prefix: /news/
-    x_accounts: [simonw, …]         # M3
-    subreddits: [LocalLLaMA]        # M3
-    hn_keywords: [claude, mcp]
+      - url: https://www.anthropic.com/sitemap.xml
+        path_prefix: /engineering/
+  - name: Cloud & IaC
+    # …plus hn_keywords / subreddits (M3) / x_accounts (M3) attach those fetchers
+    hn_keywords: [terraform, kubernetes]
 ```
 
 Seed topics: AI/LLM tooling · Cloud & IaC · DevOps/SRE tooling.
 
 Seed sources (M1):
-- OpenAI: `https://openai.com/news/rss.xml`
+- OpenAI: `https://openai.com/news/rss.xml` filtered to `Engineering` + `Product` (the feed's labels for the engineering and product-releases sections)
+- Anthropic: no RSS — sitemap fetcher against `https://www.anthropic.com/sitemap.xml`, `/news/` and `/engineering/` prefixes
 - AWS: `https://aws.amazon.com/about-aws/whats-new/recent/feed/`
-- Anthropic: no RSS — sitemap fetcher against `https://www.anthropic.com/sitemap.xml`, `/news/` prefix
 
 **Fetchers** — one per source type, all emitting `Item{id, title, url, source, published, excerpt}`:
-- **RSS/Atom**: `feedparser`. Covers blogs and GitHub release feeds (`/releases.atom`).
+- **RSS/Atom**: `feedparser`. Covers blogs and GitHub release feeds (`/releases.atom`); an optional per-feed `categories` filter narrows single-feed sites to curated sections.
 - **Sitemap (RSS-less sites)**: discover URLs via the site's `sitemap.xml` (`requests`; filter by `path_prefix`, window by `lastmod`), then fetch each candidate page with the `markfetch` CLI (markdown on stdout, `[code]` on stderr, non-zero exit). The on-page publish date wins over `lastmod` (modified ≠ published); the same fetch yields the excerpt.
 - **X (best-effort, M3)**: Nitter-compatible RSS, instance list in config (`xcancel.com` direct + `twiiit.com` redirect discovery), custom User-Agent, per-account tolerance for failure. Adapter interface so a paid API slots in without pipeline changes.
 - **Reddit (M3)**: official OAuth API, free "script" app, plain `requests` against `/r/X/new`.
