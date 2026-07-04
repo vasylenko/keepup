@@ -16,7 +16,7 @@ A feed reader moves the pile; this shrinks it. The digest must do three things a
 
 ## Solution
 
-GitHub Actions cron (Mon ~05:00 UTC, `workflow_dispatch` for reruns): fetch the week's items from curated sources per topic → one LLM call per topic clusters, ranks, and synthesizes → render static HTML → deploy to GitHub Pages. Index = latest week; archive at `/archive/2026-Wnn.html`.
+GitHub Actions cron (Mon ~05:00 UTC, `workflow_dispatch` for reruns): fetch the week's items from curated sources per topic → deterministic per-topic selection → one LLM call per topic clusters, ranks, and synthesizes → render static HTML into `docs/` → commit to `main`. GitHub Pages serves the branch (`/docs` folder, `.nojekyll`), so the commit **is** the deploy, the archive, and the cron keepalive — GitHub auto-disables schedules in public repos after 60 days without repository activity, and the weekly output commit resets that clock. Index = latest week; past weeks accumulate at `/archive/2026-Wnn.html`.
 
 ## Non-goals
 
@@ -41,11 +41,11 @@ topics:
   - name: AI/LLM tooling
     feeds:
       - url: https://openai.com/news/rss.xml
-      - url: https://rsshub.app/anthropic/news        # bridge: Anthropic has no official RSS
-        fallbacks: [https://raw.githubusercontent.com/taobojlen/anthropic-rss-feed/main/anthropic_news_rss.xml]
-    x_accounts: [simonw, …]
+      - url: https://raw.githubusercontent.com/taobojlen/anthropic-rss-feed/main/anthropic_news_rss.xml   # bridge: Anthropic has no official RSS
+        fallbacks: [https://rsshub.app/anthropic/news]
+    x_accounts: [simonw, …]         # M3
     subreddits: [LocalLLaMA]        # M3
-    hn_keywords: [claude, mcp]      # M3
+    hn_keywords: [claude, mcp]
 ```
 
 Seed topics: AI/LLM tooling · Cloud & IaC · DevOps/SRE tooling.
@@ -53,23 +53,23 @@ Seed topics: AI/LLM tooling · Cloud & IaC · DevOps/SRE tooling.
 Seed feeds (M1), **verified to exist as of July 2026**:
 - OpenAI: `https://openai.com/news/rss.xml` — official, working (old `/blog/rss.xml` is dead).
 - AWS: `https://aws.amazon.com/about-aws/whats-new/recent/feed/` — official, long-standing.
-- Anthropic: **no official RSS exists.** Bridge via RSSHub public route (`https://rsshub.app/anthropic/news`) with a community GitHub-raw feed as fallback (`taobojlen/anthropic-rss-feed`, daily-regenerated; GitHub raw is always reachable from Actions). Sites without RSS are a config concern, not a code concern: every feed entry may list `fallbacks` tried in order.
+- Anthropic: **no official RSS exists.** Primary bridge is the community GitHub-raw feed (`taobojlen/anthropic-rss-feed`, regenerated daily, alive as of 2026-06-29 — GitHub raw is always reachable from Actions); the RSSHub public route (`https://rsshub.app/anthropic/news`) is the fallback, not the primary, because rsshub.app hit from datacenter IPs is the same blocking class X and Reddit fight. Sites without RSS are a config concern, not a code concern: every feed entry may list `fallbacks` tried in order.
 
 **Fetchers** — one per source type, all emitting `Item{id, title, url, source, published, excerpt}`; approaches verified against July-2026 platform behavior:
 - **RSS/Atom**: `feedparser`. Covers blogs and GitHub release feeds (`/releases.atom`).
-- **X (best-effort)**: Nitter-compatible RSS, instance list in config (`xcancel.com` direct + `twiiit.com` redirect discovery), custom User-Agent (required since 2026-01), per-account tolerance for failure. Honest caveat: Actions runners are datacenter IPs, the same class X/Reddit are blocking — this may work partially or not at all. Adapter interface so a paid API (or RSS-Bridge on other infra) slots in without pipeline changes.
+- **X (best-effort, M3)**: Nitter-compatible RSS, instance list in config (`xcancel.com` direct + `twiiit.com` redirect discovery), custom User-Agent (required since 2026-01), per-account tolerance for failure. Honest caveat: Actions runners are datacenter IPs, the same class X/Reddit are blocking — this may work partially or not at all. Adapter interface so a paid API (or RSS-Bridge on other infra) slots in without pipeline changes.
 - **Reddit (M3)**: official OAuth API, free "script" app, plain `requests` against `/r/X/new`. Public `.json`/`.rss` endpoints 403 datacenter IPs since ~Apr 2026 — not an option from Actions.
-- **HN (M3)**: Algolia HN Search API — free, no auth, 10k req/hr, keyword + `created_at_i` week window.
+- **HN**: Algolia HN Search API — free, no auth, 10k req/hr, keyword + `created_at_i` week window. The cheapest reliable second source class, which is why it ships in M1: without it there is no cross-source echo to rank by.
 
 **Pipeline** (single Python run):
 1. Fetch all sources, 7-day window by published date; per-source timeout; a failing source never fails the run — it's skipped and footnoted.
 2. Normalize; dedupe by canonical URL (strip tracking params).
-3. Per topic: cap at ~40 items × ~500-char excerpts (fits free-tier context comfortably), one chat-completions call to GitHub Models (OpenAI-compatible, `https://models.github.ai/inference`). LLM failure ⇒ that topic renders links-only. 3–6 calls/week vs 50 RPD limit — ample headroom, and the OpenAI-compatible client makes provider swap a config change.
-4. Render (Jinja2): per topic — ranked stories (headline, why-it-matters, source links) on top, collapsible full link list below. No JS required for reading. Deploy via `actions/deploy-pages`.
+3. Per topic: **select** ≤40 items by newest-first round-robin across sources — a single high-volume feed (AWS What's New alone ships 50–100 items/week) must never crowd out the cross-source echoes ranking depends on. Selection is deterministic and versioned like the prompt: it decides what the LLM never sees, so it is the ranker's front half. Then one chat-completions call to GitHub Models (OpenAI-compatible, `https://models.github.ai/inference`). The binding free-tier constraint is per-request tokens (8k in / 4k out), not the 50 RPD (3–6 calls/week): 40 items × ~500-char excerpts ≈ 6–7k tokens with prompt, so the excerpt budget is derived from that cap. LLM failure ⇒ that topic renders links-only.
+4. Render (Jinja2) into `docs/`: per topic — ranked stories (headline, why-it-matters, source links) on top, collapsible full link list below. No JS required for reading. Publish = commit `docs/` to `main`; Pages serves from the branch.
 
 **Operations**:
 - Public repo, public Pages URL (free-plan requirement; confirmed acceptable).
-- Secrets: none for M1 beyond `GITHUB_TOKEN` (`permissions: models: read, pages: write, id-token: write`); M3 adds `REDDIT_CLIENT_ID`/`SECRET`.
+- Secrets: none for M1 beyond `GITHUB_TOKEN` (`permissions: models: read, contents: write`); M3 adds `REDDIT_CLIENT_ID`/`SECRET`.
 - Budget: $0.
 
 ## Risks
@@ -79,21 +79,32 @@ Seed feeds (M1), **verified to exist as of July 2026**:
 | X fetch breaks (likely, eventually) | Best-effort by design; digest degrades gracefully, footnote shows the gap; adapter swap point is defined |
 | Reddit tightens further | OAuth is the sanctioned path; if it dies, HN keywords cover much of the same ground |
 | GitHub Models limits/product changes | Weekly volume is ~10% of free quota; OpenAI-compatible = trivial provider swap |
+| Public-repo cron auto-disabled after 60 days of repo inactivity | Designed out: the weekly output commit is repository activity |
 | Missing/garbage `published` dates in feeds | Items without a parseable date in-window are dropped; acceptable loss for statelessness |
-| RSSHub public instance rate-limits or dies | Per-feed `fallbacks` list; RSSHub is also self-hostable if it ever matters |
+| Community Anthropic feed goes stale (one person's side project) | Per-feed `fallbacks` list (RSSHub route next in line); RSSHub is also self-hostable if it ever matters |
 | Digest drifts into slop | Anti-slop contract above is the review checklist for every prompt change |
 
 ## Tech decisions
 
 - Python 3.14, deps: `feedparser`, `requests`, `jinja2`, `pyyaml`, `openai`
-- No persistent state: week window computed from run date; dedupe within-run
-- Layout: `keepup/` (package, incl. `prompts/`) · `config/topics.yml` · `templates/` · `.github/workflows/digest.yml`
+- State = the repo, nothing else: rendered weeks are committed — they are the archive, the Pages source, and the cron keepalive at once. Week window computed from run date; dedupe within-run.
+- Layout: `keepup/` (package, incl. `prompts/`) · `config/topics.yml` · `templates/` · `docs/` (published site) · `.github/workflows/digest.yml`
+
+### Layers & contracts
+
+The pipeline is five layers; each is swappable behind its contract, so the prototype bindings (in parentheses) are conveniences, not commitments — model and host in particular are expected to change without touching neighboring layers:
+
+1. **Fetch**: source config → `Item[]` (feedparser, Algolia; one adapter per source type)
+2. **Select**: `Item[]` → ≤N per topic, deterministic and source-diverse (newest-first round-robin)
+3. **Synthesize**: selected items → `stories[]` JSON (GitHub Models behind the OpenAI-compatible client; provider + model are config)
+4. **Render**: stories + items → directory of static files (Jinja2)
+5. **Publish**: static dir → public URL (git commit + Pages-from-branch; any static host — S3, Cloudflare, Netlify — consumes the same directory)
 
 ## Milestones
 
-1. **M1** (end-to-end): RSS fetcher (Anthropic, OpenAI, AWS feeds) + X best-effort adapter + LLM synthesis + renderer + Pages deploy. Ships the actual product for the AI topic.
+1. **M1** (end-to-end): RSS fetcher (Anthropic, OpenAI, AWS feeds) + HN keyword fetcher + selection + LLM synthesis + renderer + branch publish. Ships the actual product for the AI topic with a real multi-source echo signal — vendor blog + HN thread is the canonical cluster.
 2. **M2**: remaining seed topics fleshed out; archive polish; digest self-RSS feed (so a new week can ping my reader).
-3. **M3**: Reddit + HN fetchers.
+3. **M3**: Reddit fetcher + X best-effort adapter — the most fragile source goes last, so its (expected) failure can't block proving the concept.
 
 ## Success & kill criteria
 
