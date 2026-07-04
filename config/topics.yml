@@ -1,0 +1,17 @@
+# Curated sources per topic — the single hand-edited input to the pipeline.
+llm:
+  model: openai/gpt-4.1-mini
+
+topics:
+  - name: AI/LLM tooling
+    feeds:
+      - url: https://openai.com/news/rss.xml
+    sitemaps:
+      - url: https://www.anthropic.com/sitemap.xml # Anthropic has no RSS
+        path_prefix: /news/
+    hn_keywords: [claude, "claude code", mcp, openai, gemini]
+
+  - name: Cloud & IaC
+    feeds:
+      - url: https://aws.amazon.com/about-aws/whats-new/recent/feed/
+    hn_keywords: [terraform, kubernetes, opentofu]
