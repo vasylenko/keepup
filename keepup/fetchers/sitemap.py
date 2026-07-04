@@ -17,23 +17,35 @@ from keepup.models import Item, make_item
 
 _NS = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
 # "Jun 30, 2026" / "June 30, 2026" — the publish-date style on article pages.
-_DATE = re.compile(r"([A-Z][a-z]{2,8}) (\d{1,2}), (\d{4})")
+_DATE = re.compile(r"[A-Z][a-z]{2,8} \d{1,2}, \d{4}")
 # lastmod means modified, not published: a site redeploy can bump every URL.
-# The cap bounds markfetch calls in that case; on-page dates re-filter below.
+# The cap bounds page fetches in that case; on-page dates re-filter below.
 _MAX_PAGES = 25
 
 
-def _page_date(markdown: str) -> datetime | None:
-    """Publish date printed on the page — authoritative over sitemap lastmod."""
-    match = _DATE.search(markdown[:600])
-    if not match:
-        return None
+def _parse_date(text: str) -> datetime | None:
     for fmt in ("%b %d, %Y", "%B %d, %Y"):
         try:
-            return datetime.strptime(match.group(0), fmt).replace(tzinfo=UTC)
+            return datetime.strptime(text, fmt).replace(tzinfo=UTC)
         except ValueError:
             continue
     return None
+
+
+def _h1_date(html: str) -> datetime | None:
+    """Publish date rendered next to the page's h1 (anthropic.com style).
+
+    Read from raw HTML because Readability strips the title header block,
+    so the date never survives into markfetch's markdown.
+    """
+    match = re.search(r"</h1>.{0,300}?(" + _DATE.pattern + ")", html, re.S)
+    return _parse_date(match.group(1)) if match else None
+
+
+def _page_date(markdown: str) -> datetime | None:
+    """Fallback for pages whose extracted body still opens with the date."""
+    match = _DATE.search(markdown[:600])
+    return _parse_date(match.group(0)) if match else None
 
 
 def _markfetch(url: str) -> str | None:
@@ -68,12 +80,18 @@ def fetch_sitemap(url: str, path_prefix: str, since: datetime) -> list[Item]:
     candidates.sort(reverse=True)
 
     items = []
-    for lastmod, loc in candidates[:_MAX_PAGES]:
+    for _, loc in candidates[:_MAX_PAGES]:
+        # The page's own date is required; lastmod only shortlists candidates.
+        # Trusting lastmod resurfaces years-old posts after a site redeploy.
+        page = requests.get(loc, headers={"User-Agent": CHROME_UA}, timeout=TIMEOUT)
+        published = _h1_date(page.text) if page.ok else None
+        if published and published < since:
+            continue
         markdown = _markfetch(loc)
         if not markdown:
             continue
-        published = _page_date(markdown) or lastmod
-        if published < since:
+        published = published or _page_date(markdown)
+        if not published or published < since:
             continue
         lines = [l.strip() for l in markdown.splitlines() if l.strip()]
         title = next((l.lstrip("# ") for l in lines if l.startswith("# ")), loc)
