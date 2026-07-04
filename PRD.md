@@ -47,17 +47,19 @@ topics:
         path_prefix: /news/
       - url: https://www.anthropic.com/sitemap.xml
         path_prefix: /engineering/
-  - name: Cloud & IaC
+  - name: Cloud (AWS)
+    feeds:
+      - url: https://aws.amazon.com/about-aws/whats-new/recent/feed/
+        categories: [general:products/amazon-eks, marketing:marchitecture/serverless, …]
     # …plus hn_keywords / subreddits (M3) / x_accounts (M3) attach those fetchers
-    hn_keywords: [terraform, kubernetes]
 ```
 
-Seed topics: AI/LLM tooling · Cloud & IaC · DevOps/SRE tooling.
+Seed topics: AI/LLM tooling · Cloud (AWS) · DevOps/SRE tooling.
 
 Seed sources (M1):
 - OpenAI: `https://openai.com/news/rss.xml` filtered to `Engineering` + `Product` (the feed's labels for the engineering and product-releases sections)
 - Anthropic: no RSS — sitemap fetcher against `https://www.anthropic.com/sitemap.xml`, `/news/` and `/engineering/` prefixes
-- AWS: `https://aws.amazon.com/about-aws/whats-new/recent/feed/`
+- AWS: `https://aws.amazon.com/about-aws/whats-new/recent/feed/` filtered by AWS's own tags to secrets management (Secrets Manager), kubernetes (EKS), compute, and serverless
 
 **Fetchers** — one per source type, all emitting `Item{id, title, url, source, published, excerpt}`:
 - **RSS/Atom**: `feedparser`. Covers blogs and GitHub release feeds (`/releases.atom`); an optional per-feed `categories` filter narrows single-feed sites to curated sections.
