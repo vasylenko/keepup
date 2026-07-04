@@ -19,7 +19,9 @@ def _clean(text: str, limit: int = 500) -> str:
     return " ".join(html.unescape(_TAGS.sub(" ", text)).split())[:limit]
 
 
-def fetch_feed(url: str, since: datetime, categories: list[str] | None = None) -> list[Item]:
+def fetch_feed(
+    url: str, since: datetime, categories: list[str] | None = None, name: str = ""
+) -> list[Item]:
     """Fetch one feed and return items published inside the window.
 
     Fetched via requests (feedparser has no timeout control), then parsed
@@ -33,7 +35,7 @@ def fetch_feed(url: str, since: datetime, categories: list[str] | None = None) -
     if parsed.bozo and not parsed.entries:
         raise RuntimeError(f"unparseable feed: {parsed.bozo_exception}")
 
-    source = parsed.feed.get("title") or urlsplit(url).netloc
+    source = name or parsed.feed.get("title") or urlsplit(url).netloc
     items = []
     for entry in parsed.entries:
         stamp = entry.get("published_parsed") or entry.get("updated_parsed")
@@ -43,7 +45,12 @@ def fetch_feed(url: str, since: datetime, categories: list[str] | None = None) -
         if published < since:
             continue
         if categories:
-            entry_categories = {tag.get("term") for tag in entry.get("tags", [])}
+            # AWS packs all tags into one comma-joined <category> element.
+            entry_categories = {
+                c.strip()
+                for tag in entry.get("tags", [])
+                for c in (tag.get("term") or "").split(",")
+            }
             if not entry_categories & set(categories):
                 continue
         items.append(

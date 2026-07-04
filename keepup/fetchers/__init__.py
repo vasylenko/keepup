@@ -19,7 +19,7 @@ def fetch_topic(topic: Topic, since: datetime) -> tuple[list[Item], list[str]]:
 
     for feed in topic.feeds:
         try:
-            items += rss.fetch_feed(feed.url, since, feed.categories)
+            items += rss.fetch_feed(feed.url, since, feed.categories, feed.name)
         except Exception as exc:
             failed.append(f"{urlsplit(feed.url).netloc} ({exc.__class__.__name__})")
 

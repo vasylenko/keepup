@@ -10,6 +10,7 @@ import yaml
 class FeedSource:
     url: str
     categories: list[str] = field(default_factory=list)  # empty ⇒ take all entries
+    name: str = ""  # display name when the feed's own title is unhelpful
 
 
 @dataclass
@@ -38,7 +39,10 @@ def load_config(path: str | Path = "config/topics.yml") -> Config:
     topics = [
         Topic(
             name=t["name"],
-            feeds=[FeedSource(f["url"], f.get("categories", [])) for f in t.get("feeds", [])],
+            feeds=[
+                FeedSource(f["url"], f.get("categories", []), f.get("name", ""))
+                for f in t.get("feeds", [])
+            ],
             sitemaps=[SitemapSource(s["url"], s["path_prefix"]) for s in t.get("sitemaps", [])],
             hn_keywords=t.get("hn_keywords", []),
         )

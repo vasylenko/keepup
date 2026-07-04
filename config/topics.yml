@@ -15,7 +15,14 @@ topics:
       - url: https://www.anthropic.com/sitemap.xml
         path_prefix: /engineering/
 
-  - name: Cloud & IaC
+  - name: Cloud (AWS)
     feeds:
       - url: https://aws.amazon.com/about-aws/whats-new/recent/feed/
-    hn_keywords: [terraform, kubernetes, opentofu]
+        name: AWS What's New # the feed titles itself "Recent Announcements"
+        # AWS's own tags, scoped to: secrets management, kubernetes,
+        # compute, serverless
+        categories:
+          - general:products/aws-secrets-manager
+          - general:products/amazon-eks
+          - marketing:marchitecture/compute
+          - marketing:marchitecture/serverless
