@@ -16,7 +16,7 @@ A feed reader moves the pile; this shrinks it. The digest must do three things a
 
 ## Solution
 
-GitHub Actions cron (Mon ~05:00 UTC, `workflow_dispatch` for reruns): fetch the week's items from curated sources per topic → deterministic per-topic selection → one LLM call per topic clusters, ranks, and synthesizes → render static HTML into `docs/` → commit to `main`. GitHub Pages serves the branch (`/docs` folder, `.nojekyll`), so the commit **is** the deploy, the archive, and the cron keepalive — GitHub auto-disables schedules in public repos after 60 days without repository activity, and the weekly output commit resets that clock. Index = latest week; past weeks accumulate at `/archive/2026-Wnn.html`.
+GitHub Actions cron (Mon ~05:00 UTC, `workflow_dispatch` for reruns): fetch the week's items from curated sources per topic → deterministic per-topic selection → one LLM call per topic clusters, ranks, and synthesizes → render static HTML into `docs/` → commit to `main`. GitHub Pages serves the branch (`/docs` folder, `.nojekyll`): the commit is the deploy, the archive, and the repo activity that keeps the schedule enabled. Index = latest week; past weeks accumulate at `/archive/2026-Wnn.html`.
 
 ## Non-goals
 
@@ -51,50 +51,38 @@ topics:
 
 Seed topics: AI/LLM tooling · Cloud & IaC · DevOps/SRE tooling.
 
-Seed sources (M1), **verified working as of July 2026**:
-- OpenAI: `https://openai.com/news/rss.xml` — official, working (old `/blog/rss.xml` is dead).
-- AWS: `https://aws.amazon.com/about-aws/whats-new/recent/feed/` — official, long-standing.
-- Anthropic: **no official RSS exists** — covered by the sitemap fetcher against `https://www.anthropic.com/sitemap.xml` with `/news/` prefix. Verified: 482 URLs, real per-page `lastmod` timestamps, and deploy-time `lastmod` bumps don't touch `/news/` pages, so the week window stays clean.
+Seed sources (M1):
+- OpenAI: `https://openai.com/news/rss.xml`
+- AWS: `https://aws.amazon.com/about-aws/whats-new/recent/feed/`
+- Anthropic: no RSS — sitemap fetcher against `https://www.anthropic.com/sitemap.xml`, `/news/` prefix
 
-**Fetchers** — one per source type, all emitting `Item{id, title, url, source, published, excerpt}`; approaches verified against July-2026 platform behavior:
+**Fetchers** — one per source type, all emitting `Item{id, title, url, source, published, excerpt}`:
 - **RSS/Atom**: `feedparser`. Covers blogs and GitHub release feeds (`/releases.atom`).
-- **Sitemap (RSS-less sites)**: discover via the site's own `sitemap.xml` (`requests`; filter by configured `path_prefix`, window by `lastmod`), then fetch each candidate page with the `markfetch` CLI — subprocess contract: markdown on stdout, `[code] message` on stderr, non-zero exit on failure. The on-page publish date is authoritative because `lastmod` means modified, not published — edited old posts are filtered at this step, which also yields the excerpt. Candidate volume is a handful of pages/week per site; markfetch's real-Chrome fingerprint is what gets them past bot protection from datacenter IPs.
-- **X (best-effort, M3)**: Nitter-compatible RSS, instance list in config (`xcancel.com` direct + `twiiit.com` redirect discovery), custom User-Agent (required since 2026-01), per-account tolerance for failure. Honest caveat: Actions runners are datacenter IPs, the same class X/Reddit are blocking — this may work partially or not at all. Adapter interface so a paid API (or RSS-Bridge on other infra) slots in without pipeline changes.
-- **Reddit (M3)**: official OAuth API, free "script" app, plain `requests` against `/r/X/new`. Public `.json`/`.rss` endpoints 403 datacenter IPs since ~Apr 2026 — not an option from Actions.
-- **HN**: Algolia HN Search API — free, no auth, 10k req/hr, keyword + `created_at_i` week window. The cheapest reliable second source class, which is why it ships in M1: without it there is no cross-source echo to rank by.
+- **Sitemap (RSS-less sites)**: discover URLs via the site's `sitemap.xml` (`requests`; filter by `path_prefix`, window by `lastmod`), then fetch each candidate page with the `markfetch` CLI (markdown on stdout, `[code]` on stderr, non-zero exit). The on-page publish date wins over `lastmod` (modified ≠ published); the same fetch yields the excerpt.
+- **X (best-effort, M3)**: Nitter-compatible RSS, instance list in config (`xcancel.com` direct + `twiiit.com` redirect discovery), custom User-Agent, per-account tolerance for failure. Adapter interface so a paid API slots in without pipeline changes.
+- **Reddit (M3)**: official OAuth API, free "script" app, plain `requests` against `/r/X/new`.
+- **HN**: Algolia HN Search API — free, no auth, keyword + `created_at_i` week window.
 
 **Pipeline** (single Python run):
-1. Fetch all sources, 7-day window by published date; per-source timeout; a failing source never fails the run — it's skipped and footnoted.
+1. Fetch all sources, 7-day window by published date (undated items are dropped); per-source timeout; a failing source never fails the run — it's skipped and footnoted.
 2. Normalize; dedupe by canonical URL (strip tracking params).
-3. Per topic: **select** ≤40 items by newest-first round-robin across sources — a single high-volume feed (AWS What's New alone ships 50–100 items/week) must never crowd out the cross-source echoes ranking depends on. Selection is deterministic and versioned like the prompt: it decides what the LLM never sees, so it is the ranker's front half. Then one chat-completions call to GitHub Models (OpenAI-compatible, `https://models.github.ai/inference`). The binding free-tier constraint is per-request tokens (8k in / 4k out), not the 50 RPD (3–6 calls/week): 40 items × ~500-char excerpts ≈ 6–7k tokens with prompt, so the excerpt budget is derived from that cap. LLM failure ⇒ that topic renders links-only.
+3. Per topic: **select** ≤40 items by newest-first round-robin across sources, so a single high-volume feed can't crowd out the cross-source echoes ranking depends on. One chat-completions call to GitHub Models (OpenAI-compatible, `https://models.github.ai/inference`); excerpt budget derives from the free tier's 8k-in/4k-out per-request cap. LLM failure ⇒ that topic renders links-only.
 4. Render (Jinja2) into `docs/`: per topic — ranked stories (headline, why-it-matters, source links) on top, collapsible full link list below. No JS required for reading. Publish = commit `docs/` to `main`; Pages serves from the branch.
 
 **Operations**:
-- Public repo, public Pages URL (free-plan requirement; confirmed acceptable).
+- Public repo, public Pages URL (free plan).
 - Secrets: none for M1 beyond `GITHUB_TOKEN` (`permissions: models: read, contents: write`); M3 adds `REDDIT_CLIENT_ID`/`SECRET`.
 - Budget: $0.
 
-## Risks
-
-| Risk | Stance |
-|---|---|
-| X fetch breaks (likely, eventually) | Best-effort by design; digest degrades gracefully, footnote shows the gap; adapter swap point is defined |
-| Reddit tightens further | OAuth is the sanctioned path; if it dies, HN keywords cover much of the same ground |
-| GitHub Models limits/product changes | Weekly volume is ~10% of free quota; OpenAI-compatible = trivial provider swap |
-| Public-repo cron auto-disabled after 60 days of repo inactivity | Designed out: the weekly output commit is repository activity |
-| Missing/garbage `published` dates in feeds | Items without a parseable date in-window are dropped; acceptable loss for statelessness |
-| Bot protection blocks sitemap/article fetches from Actions datacenter IPs | markfetch sends a real-Chrome fingerprint; smoke-test from a runner early in M1; a blocked source degrades to a footnote like any other |
-| Digest drifts into slop | Anti-slop contract above is the review checklist for every prompt change |
-
 ## Tech decisions
 
-- Python 3.14, deps: `feedparser`, `requests`, `jinja2`, `pyyaml`, `openai`. One external CLI: `markfetch` (npm, self-contained; Node is preinstalled on GitHub runners, `npm i -g markfetch` in the workflow). Python orchestrates everything — markfetch is a leaf tool at a subprocess boundary, never an orchestrator.
-- State = the repo, nothing else: rendered weeks are committed — they are the archive, the Pages source, and the cron keepalive at once. Week window computed from run date; dedupe within-run.
+- Python 3.14, deps: `feedparser`, `requests`, `jinja2`, `pyyaml`, `openai`; plus the `markfetch` CLI (npm) as a subprocess for page→markdown.
+- State = the repo, nothing else: rendered weeks are committed (archive + Pages source + schedule keepalive). Week window computed from run date; dedupe within-run.
 - Layout: `keepup/` (package, incl. `prompts/`) · `config/topics.yml` · `templates/` · `docs/` (published site) · `.github/workflows/digest.yml`
 
 ### Layers & contracts
 
-The pipeline is five layers; each is swappable behind its contract, so the prototype bindings (in parentheses) are conveniences, not commitments — model and host in particular are expected to change without touching neighboring layers:
+Five layers, each swappable behind its contract; prototype bindings in parentheses:
 
 1. **Fetch**: source config → `Item[]` (feedparser, Algolia, sitemap + markfetch; one adapter per source type)
 2. **Select**: `Item[]` → ≤N per topic, deterministic and source-diverse (newest-first round-robin)
@@ -104,9 +92,9 @@ The pipeline is five layers; each is swappable behind its contract, so the proto
 
 ## Milestones
 
-1. **M1** (end-to-end): RSS fetcher (OpenAI, AWS) + sitemap fetcher (Anthropic) + HN keyword fetcher + selection + LLM synthesis + renderer + branch publish. Ships the actual product for the AI topic with a real multi-source echo signal — vendor blog + HN thread is the canonical cluster.
+1. **M1** (end-to-end): RSS fetcher (OpenAI, AWS) + sitemap fetcher (Anthropic) + HN keyword fetcher + selection + LLM synthesis + renderer + branch publish. Ships the actual product for the AI topic.
 2. **M2**: remaining seed topics fleshed out; archive polish; digest self-RSS feed (so a new week can ping my reader).
-3. **M3**: Reddit fetcher + X best-effort adapter — the most fragile source goes last, so its (expected) failure can't block proving the concept.
+3. **M3**: Reddit fetcher + X best-effort adapter.
 
 ## Success & kill criteria
 
