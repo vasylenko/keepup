@@ -23,7 +23,7 @@
 <body>
 <header>
   <h1>keepup</h1>
-  <p class="meta">Week 2026-W27 · generated Jul 04, 2026 18:48 UTC</p>
+  <p class="meta">Week 2026-W27 · generated Jul 04, 2026 19:07 UTC</p>
 </header>
 
 
@@ -39,20 +39,20 @@
     </article>
     
     <article>
-      <h3>Anthropic introduces Claude Sonnet 5, an agentic AI model with autonomous planning and tool use</h3>
-      <p>Claude Sonnet 5 advances agentic AI capabilities by enabling autonomous planning and interaction with external tools like browsers and terminals, previously requiring larger models. This marks a step forward in accessible, versatile AI agents for developers.</p>
+      <h3>Anthropic introduces Claude Sonnet 5, an agentic AI model with autonomous capabilities</h3>
+      <p>Claude Sonnet 5 advances the agentic AI paradigm by enabling autonomous planning and tool use, such as browsing and terminal operations, at a scale previously requiring larger models. This development lowers barriers for developers building autonomous AI agents.</p>
       <p class="links"><a href="https://www.anthropic.com/news/claude-sonnet-5" title="Introducing Claude Sonnet 5">anthropic.com</a></p>
     </article>
     
     <article>
-      <h3>Anthropic launches Claude Science, an AI workbench aimed at accelerating scientific discovery</h3>
-      <p>Claude Science integrates AI capabilities with scientific ecosystems to support research and healthcare innovation, reflecting growing AI adoption in life sciences. Engineers working in scientific domains can leverage this platform to enhance productivity and insight generation.</p>
+      <h3>Anthropic launches Claude Science, an AI workbench tailored for scientific research</h3>
+      <p>Claude Science aims to accelerate scientific discovery and healthcare innovation by integrating AI capabilities with scientific ecosystems and model improvements. This specialized AI workbench offers researchers new tools to enhance productivity and insight generation.</p>
       <p class="links"><a href="https://www.anthropic.com/news/claude-science-ai-workbench" title="Claude Science, an AI workbench for scientists">anthropic.com</a></p>
     </article>
     
     <article>
       <h3>OpenAI engineers resolve an 18-year-old software bug using large-scale core dump analysis</h3>
-      <p>By analyzing extensive core dumps, OpenAI identified and fixed a rare infrastructure crash caused by both hardware faults and a longstanding software bug. This demonstrates the value of deep diagnostic techniques in maintaining robust AI infrastructure.</p>
+      <p>By analyzing extensive core dumps, OpenAI identified and fixed a rare infrastructure crash caused by both hardware faults and a long-standing software bug. This highlights the value of deep diagnostic techniques in maintaining robust AI infrastructure.</p>
       <p class="links"><a href="https://openai.com/index/core-dump-epidemiology-data-infrastructure-bug" title="Core dump epidemiology: fixing an 18-year-old bug">OpenAI News</a></p>
     </article>
     
@@ -86,178 +86,91 @@
 </section>
 
 <section>
-  <h2>Cloud & IaC</h2>
+  <h2>Cloud (AWS)</h2>
 
   
     
     <article>
-      <h3>Fix for kubelet memory leak in Kubernetes 1.36 released</h3>
-      <p>A significant memory leak issue in Kubernetes 1.36's kubelet component has been identified and fixed, addressing stability and resource usage concerns for cluster operators. This fix is critical for maintaining reliable Kubernetes clusters at scale.</p>
-      <p class="links"><a href="https://heyoncall.com/blog/fixing-kubernetes-kubelet-memory-leak" title="Fixing a kubelet memory leak in Kubernetes 1.36">Hacker News</a></p>
+      <h3>Amazon EC2 introduces new instance types and expands availability</h3>
+      <p>AWS expanded the availability of EC2 X8i instances to more Asia Pacific regions and launched new C9g and C9gd compute optimized instances powered by the latest Graviton5 processors. These additions provide engineers with more options for high-performance and cost-effective compute resources tailored to specific workloads.</p>
+      <p class="links"><a href="https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-ec2-x8i-instances-ICN-KUL-NRT-region" title="Amazon EC2 X8i instances are now available in additional regions">AWS What's New</a><a href="https://aws.amazon.com/about-aws/whats-new/2026/06/ec2-c9g-c9gd-instances-graviton5-processors-available" title="Amazon EC2 C9g and C9gd compute optimized instances are now available">AWS What's New</a></p>
     </article>
     
     <article>
-      <h3>New tools and methods improve Kubernetes observability and incident investigation</h3>
-      <p>Several new open-source tools and guides have emerged to enhance Kubernetes observability and incident response, including Groot and Kube-insight for retaining incident evidence, Stern for multi-pod log tailing, and an SRE guide to observability methods. These tools help engineers diagnose and resolve issues faster in complex Kubernetes environments.</p>
-      <p class="links"><a href="https://github.com/hrodrig/groot/releases/tag/v1.0.0" title="Show HN: Groot – Kubernetes incident evidence in one .tar.gz">Hacker News</a><a href="https://github.com/nowakeai/kube-insight" title="Show HN: Kube-insight – retained Kubernetes evidence for incident investigations">Hacker News</a><a href="https://github.com/stern/stern" title="Stern: Multi pod and container log tailing for Kubernetes">Hacker News</a><a href="https://www.buoyant.io/blog/the-sre-guide-to-kubernetes-observability-red-vs-use-methods" title="The SRE Guide to Kubernetes Observability: Red vs. Use Methods">Hacker News</a></p>
+      <h3>Amazon EC2 Dedicated Hosts add support for AMD SEV-SNP confidential computing</h3>
+      <p>Support for AMD Secure Encrypted Virtualization-Secure Nested Paging (SEV-SNP) on Dedicated Hosts enables customers to run confidential computing workloads on physical servers fully dedicated to them, enhancing security and compliance for sensitive applications.</p>
+      <p class="links"><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/ec2-amd-sev-snp-dedicated-hosts" title="Amazon EC2 Dedicated Hosts now support AMD SEV-SNP">AWS What's New</a></p>
     </article>
     
     <article>
-      <h3>Amazon EKS adds Kubernetes version rollback capability</h3>
-      <p>Amazon EKS now supports rolling back Kubernetes minor version upgrades within 7 days, providing a safety net for cluster administrators to quickly revert problematic upgrades and reduce downtime risks during version transitions.</p>
-      <p class="links"><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-eks-version-rollback" title="Amazon EKS now supports Kubernetes version rollback">Recent Announcements</a></p>
-    </article>
-    
-    <article>
-      <h3>Amazon SageMaker Unified Studio and HyperPod gain Terraform support and AMI versioning</h3>
-      <p>Amazon SageMaker Unified Studio now supports provisioning via Terraform modules, enabling infrastructure as code for machine learning environments. Additionally, SageMaker HyperPod introduces AMI version visibility and auto-patching, improving security and operational management of ML training infrastructure.</p>
-      <p class="links"><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-sagemaker-unified-studio-terraform" title="Amazon SageMaker Unified Studio now supports Terraform for provisioning">Recent Announcements</a><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-sagemaker-hyperpod-ami-version-auto-patch" title="Amazon SageMaker HyperPod now supports AMI versioning and auto-patching">Recent Announcements</a></p>
-    </article>
-    
-    <article>
-      <h3>Amazon ECS introduces real-time deployment observability and configurable deployment circuit breakers</h3>
-      <p>Amazon ECS customers can now monitor deployment progress and health in real time via the console and customize deployment circuit breaker settings to better match application behavior, improving deployment reliability and troubleshooting.</p>
-      <p class="links"><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-ecs-aws-management-console" title="Amazon ECS now provides real-time deployment observability in the AWS Management Console">Recent Announcements</a><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-ecs-circuit-breaker-settings" title="Amazon ECS now supports configurable deployment circuit breaker settings">Recent Announcements</a></p>
+      <h3>Amazon ECS and EKS receive updates to improve deployment flexibility and security</h3>
+      <p>Amazon ECS now supports configurable deployment circuit breaker settings and custom task definitions in Express Mode, allowing more control and reuse of existing configurations. Additionally, Amazon EKS supports Kubernetes version rollback to mitigate upgrade risks, while AWS Network Firewall adds container attribute-based inspection for EKS and ECS workloads, improving security posture for containerized applications.</p>
+      <p class="links"><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-ecs-circuit-breaker-settings" title="Amazon ECS now supports configurable deployment circuit breaker settings">AWS What's New</a><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-ecs-express-mode-custom-task-def" title="Amazon ECS Express Mode now supports custom task definitions">AWS What's New</a><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-eks-version-rollback" title="Amazon EKS now supports Kubernetes version rollback">AWS What's New</a><a href="https://aws.amazon.com/about-aws/whats-new/2026/06/aws-network-firewall-container-attributes-referencing" title="AWS Network Firewall now supports container attribute-based inspection for Amazon EKS and Amazon ECS">AWS What's New</a></p>
     </article>
     
     <article>
       <h3>Amazon GuardDuty Runtime Monitoring adds sensitive file modification threat detections</h3>
-      <p>Amazon GuardDuty now detects unauthorized modifications to sensitive files on EC2 instances and container workloads, enhancing security posture by identifying potential post-compromise attacker activities in real time.</p>
-      <p class="links"><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-guardduty-sfm" title="Amazon GuardDuty adds sensitive file modification threat detections">Recent Announcements</a></p>
+      <p>New threat detections in GuardDuty Runtime Monitoring alert security teams to modifications of sensitive files on EC2 instances and container workloads, helping identify post-compromise attacker activities and enhancing incident response capabilities.</p>
+      <p class="links"><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-guardduty-sfm" title="Amazon GuardDuty adds sensitive file modification threat detections">AWS What's New</a></p>
     </article>
     
     <article>
-      <h3>Amazon Managed Service for Prometheus achieves FedRAMP High and DoD IL-4/5 authorization in AWS GovCloud</h3>
-      <p>This authorization enables federal and defense customers to use Amazon Managed Service for Prometheus for monitoring workloads in compliance with stringent government security standards, expanding its adoption in regulated environments.</p>
-      <p class="links"><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-managed-service-prometheus-fedramp-high" title="Amazon Managed Service for Prometheus achieves FedRAMP High and DoD IL-4/5 authorization in AWS GovCloud (US)">Recent Announcements</a></p>
+      <h3>AWS Parallel Computing Service supports in-place Slurm major version upgrades</h3>
+      <p>PCS now allows managed in-place upgrades of Slurm clusters up to three major versions ahead without disrupting running jobs, simplifying cluster maintenance and minimizing downtime for HPC workloads.</p>
+      <p class="links"><a href="https://aws.amazon.com/about-aws/whats-new/2026/06/aws-parallel-computing-service-upgrade" title="AWS Parallel Computing Service supports in-place Slurm major version upgrades">AWS What's New</a></p>
+    </article>
+    
+    <article>
+      <h3>Amazon Time Sync Service extends microsecond accurate time support to more EC2 instance types</h3>
+      <p>Microsecond accurate time and nanosecond precision hardware timestamps are now available on 26 additional EC2 instance types across all commercial regions, improving time synchronization precision for distributed applications and time-sensitive workloads.</p>
+      <p class="links"><a href="https://aws.amazon.com/about-aws/whats-new/2026/06/ec2-time-sync-precision-time-placement-group" title="Amazon Time Sync Service adds support for Microsecond accurate time on 26 additional EC2 instance types in all commercial regions">AWS What's New</a></p>
+    </article>
+    
+    <article>
+      <h3>Amazon EC2 Auto Scaling introduces reservations-then-balanced Availability Zone distribution</h3>
+      <p>The new AZ distribution strategy prioritizes launching instances into capacity reservations before balancing across zones, maximizing utilization of reserved capacity and improving cost efficiency for auto scaling groups.</p>
+      <p class="links"><a href="https://aws.amazon.com/about-aws/whats-new/2026/06/ec2-auto-scaling-res-then-balanced" title="Amazon EC2 Auto Scaling now supports reservations then balanced Availability Zone distribution">AWS What's New</a></p>
     </article>
     
   
 
   
   <details>
-    <summary>All 40 items this week</summary>
+    <summary>All 11 items this week</summary>
     <ul>
       
-      <li><a href="https://github.com/hrodrig/groot/releases/tag/v1.0.0">Show HN: Groot – Kubernetes incident evidence in one .tar.gz</a>
-          <span class="meta">Hacker News · Jul 04</span></li>
-      
-      <li><a href="https://www.resilopshq.com/">Ask HN: Do teams proactively validate Kubernetes resilience against SLOs?</a>
-          <span class="meta">Hacker News · Jul 04</span></li>
-      
-      <li><a href="https://github.com/stern/stern">Stern: Multi pod and container log tailing for Kubernetes</a>
-          <span class="meta">Hacker News · Jul 03</span></li>
-      
-      <li><a href="https://masterpoint.io/blog/using-opentofu-exclude-flag-isolate-performance-bottlenecks">Using OpenTofu's Exclude Flag to Isolate Performance Bottlenecks</a>
-          <span class="meta">Hacker News · Jul 03</span></li>
-      
-      <li><a href="https://www.buoyant.io/blog/the-sre-guide-to-kubernetes-observability-red-vs-use-methods">The SRE Guide to Kubernetes Observability: Red vs. Use Methods</a>
-          <span class="meta">Hacker News · Jul 03</span></li>
-      
-      <li><a href="https://github.com/documentdb/documentdb-kubernetes-operator/blob/main/documentdb-playground/multi-cloud-deployment/README.md">Multi-Cloud DocumentDB Deployment (Kubernetes Operator)</a>
-          <span class="meta">Hacker News · Jul 03</span></li>
-      
-      <li><a href="https://github.com/Tight-Line/ballast">Automatic Kubernetes workload resource adjuster</a>
-          <span class="meta">Hacker News · Jul 02</span></li>
-      
-      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-sagemaker-unified-studio-terraform">Amazon SageMaker Unified Studio now supports Terraform for provisioning</a>
-          <span class="meta">Recent Announcements · Jul 02</span></li>
-      
       <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-ec2-x8i-instances-ICN-KUL-NRT-region">Amazon EC2 X8i instances are now available in additional regions</a>
-          <span class="meta">Recent Announcements · Jul 02</span></li>
-      
-      <li><a href="https://cloudnativenow.com/features/tigera-introduces-lynx-a-unified-control-plane-for-kubernetes%e2%80%91native-ai-agents">Tigera Introduces Lynx, a Unified Control Plane for Kubernetes‑Native AI Agents</a>
-          <span class="meta">Hacker News · Jul 02</span></li>
+          <span class="meta">AWS What's New · Jul 02</span></li>
       
       <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/ec2-amd-sev-snp-dedicated-hosts">Amazon EC2 Dedicated Hosts now support AMD SEV-SNP</a>
-          <span class="meta">Recent Announcements · Jul 02</span></li>
-      
-      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-sagemaker-hyperpod-ami-version-auto-patch">Amazon SageMaker HyperPod now supports AMI versioning and auto-patching</a>
-          <span class="meta">Recent Announcements · Jul 02</span></li>
-      
-      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/06/aws-config-new-resource-types">AWS Config now supports 8 new resource types</a>
-          <span class="meta">Recent Announcements · Jul 02</span></li>
-      
-      <li><a href="https://github.com/nowakeai/kube-insight">Show HN: Kube-insight – retained Kubernetes evidence for incident investigations</a>
-          <span class="meta">Hacker News · Jul 02</span></li>
-      
-      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-bedrock-agentcore-increases-default-runtime-quota-limits">Amazon Bedrock AgentCore increases default runtime quota limits</a>
-          <span class="meta">Recent Announcements · Jul 01</span></li>
-      
-      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-cloudwatch-log-alarms">Amazon CloudWatch supports creating alarms from log queries</a>
-          <span class="meta">Recent Announcements · Jul 01</span></li>
-      
-      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-ecs-aws-management-console">Amazon ECS now provides real-time deployment observability in the AWS Management Console</a>
-          <span class="meta">Recent Announcements · Jul 01</span></li>
-      
-      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/aws-artifact-assurance-assistant">AWS Artifact now includes Assurance Assistant for compliance inquiries</a>
-          <span class="meta">Recent Announcements · Jul 01</span></li>
-      
-      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/aws-marketplace-co-selling-support">AWS Partner Central now supports AWS Marketplace listings for co-selling</a>
-          <span class="meta">Recent Announcements · Jul 01</span></li>
-      
-      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-rds-cross-region-automated-backups-additional-aws-regions">Amazon RDS announces Cross-Region Automated Backups in four additional AWS Regions</a>
-          <span class="meta">Recent Announcements · Jul 01</span></li>
-      
-      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/06/amazon-bedrock-agentcore-four-additional-regions">Amazon Bedrock AgentCore now available in four additional AWS Regions</a>
-          <span class="meta">Recent Announcements · Jul 01</span></li>
+          <span class="meta">AWS What's New · Jul 02</span></li>
       
       <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-ecs-circuit-breaker-settings">Amazon ECS now supports configurable deployment circuit breaker settings</a>
-          <span class="meta">Recent Announcements · Jul 01</span></li>
+          <span class="meta">AWS What's New · Jul 01</span></li>
       
       <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-guardduty-sfm">Amazon GuardDuty adds sensitive file modification threat detections</a>
-          <span class="meta">Recent Announcements · Jul 01</span></li>
-      
-      <li><a href="https://github.com/mkdev-me/terraform-aws-github-runner-lambda-microvms/tree/main">Self-Hosted GitHub Actions Runners on Lambda MicroVMs</a>
-          <span class="meta">Hacker News · Jul 01</span></li>
-      
-      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/6/aws-appconfig-experimentation">AWS AppConfig launches managed experimentation tools for A/B testing</a>
-          <span class="meta">Recent Announcements · Jul 01</span></li>
+          <span class="meta">AWS What's New · Jul 01</span></li>
       
       <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-ecs-express-mode-custom-task-def">Amazon ECS Express Mode now supports custom task definitions</a>
-          <span class="meta">Recent Announcements · Jul 01</span></li>
+          <span class="meta">AWS What's New · Jul 01</span></li>
       
       <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-eks-version-rollback">Amazon EKS now supports Kubernetes version rollback</a>
-          <span class="meta">Recent Announcements · Jul 01</span></li>
+          <span class="meta">AWS What's New · Jul 01</span></li>
       
-      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-managed-service-prometheus-fedramp-high">Amazon Managed Service for Prometheus achieves FedRAMP High and DoD IL-4/5 authorization in AWS GovCloud (US)</a>
-          <span class="meta">Recent Announcements · Jul 01</span></li>
+      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/06/aws-parallel-computing-service-upgrade">AWS Parallel Computing Service supports in-place Slurm major version upgrades</a>
+          <span class="meta">AWS What's New · Jun 30</span></li>
       
-      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/aws-security-agent-asia-pacific">AWS Security Agent now available in Asia Pacific (Mumbai), Asia Pacific (Singapore), and South America (São Paulo)</a>
-          <span class="meta">Recent Announcements · Jul 01</span></li>
+      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/06/ec2-time-sync-precision-time-placement-group">Amazon Time Sync Service adds support for Microsecond accurate time on 26 additional EC2 instance types in all commercial regions</a>
+          <span class="meta">AWS What's New · Jun 30</span></li>
       
-      <li><a href="https://www.ianwootten.co.uk/2026/07/01/ditching-claude-for-opencode-and-openrouter">Ditching Claude for OpenCode and OpenRouter</a>
-          <span class="meta">Hacker News · Jul 01</span></li>
+      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/06/ec2-auto-scaling-res-then-balanced">Amazon EC2 Auto Scaling now supports reservations then balanced Availability Zone distribution</a>
+          <span class="meta">AWS What's New · Jun 30</span></li>
       
-      <li><a href="https://github.com/bytestrix/InfraCanvas">Show HN: InfraCanvas – See your VMs, Docker and Kubernetes on one live canvas</a>
-          <span class="meta">Hacker News · Jul 01</span></li>
+      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/06/aws-network-firewall-container-attributes-referencing">AWS Network Firewall now supports container attribute-based inspection for Amazon EKS and Amazon ECS</a>
+          <span class="meta">AWS What's New · Jun 30</span></li>
       
-      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/07/amazon-rds-db2-supports-self-managed-active-directory">Amazon RDS for Db2 now supports self-managed Active Directory</a>
-          <span class="meta">Recent Announcements · Jul 01</span></li>
-      
-      <li><a href="https://heyoncall.com/blog/fixing-kubernetes-kubelet-memory-leak">Fixing a kubelet memory leak in Kubernetes 1.36</a>
-          <span class="meta">Hacker News · Jul 01</span></li>
-      
-      <li><a href="https://github.com/hyperb1iss/sibyl">Show HN: Sibyl – self-hosted cross-agent memory for AI coding agents</a>
-          <span class="meta">Hacker News · Jul 01</span></li>
-      
-      <li><a href="https://ngrok.com/blog/i-ported-kubernetes-to-the-browser">I ported Kubernetes to the browser</a>
-          <span class="meta">Hacker News · Jun 30</span></li>
-      
-      <li><a href="https://github.com/yusukeshib/looop">Looop – A tiny, portable, Kubernetes-shaped control loop for your LLM agent</a>
-          <span class="meta">Hacker News · Jun 30</span></li>
-      
-      <li><a href="https://play.google.com/store/apps/details?id=com.iishanto.servermanager&hl=en_US">Show HN: ServerKit – A mobile UI for server management</a>
-          <span class="meta">Hacker News · Jun 30</span></li>
-      
-      <li><a href="https://status.hashicorp.com/incidents/01KWC7AT3FX788RDTR759G7SNV">Terraform releases page experiencing errors</a>
-          <span class="meta">Hacker News · Jun 30</span></li>
-      
-      <li><a href="https://marmotdata.io/">Show HN: Marmot, context layer for agents and humans</a>
-          <span class="meta">Hacker News · Jun 29</span></li>
-      
-      <li><a href="https://roszigit.com/en/blog/kubernetes-cpu-request-limit">Kubernetes CPU requests and limits, explained through cgroups</a>
-          <span class="meta">Hacker News · Jun 28</span></li>
+      <li><a href="https://aws.amazon.com/about-aws/whats-new/2026/06/ec2-c9g-c9gd-instances-graviton5-processors-available">Amazon EC2 C9g and C9gd compute optimized instances are now available</a>
+          <span class="meta">AWS What's New · Jun 30</span></li>
       
     </ul>
   </details>
