@@ -61,6 +61,7 @@ Seed topics: AI/LLM tooling · Engineering blogs · Cloud (AWS) · DevOps/SRE to
 
 Seed sources (M1):
 - OpenAI: `https://openai.com/news/rss.xml` filtered to `Engineering` + `Product` (the feed's labels for the engineering and product-releases sections)
+- Codex: `https://developers.openai.com/codex/changelog/rss.xml` — per-entry anchors on one page, hence canonical URLs keep fragments
 - Anthropic: no RSS — sitemap fetcher against `https://www.anthropic.com/sitemap.xml`, `/news/` and `/engineering/` prefixes
 - AWS: `https://aws.amazon.com/about-aws/whats-new/recent/feed/` filtered by AWS's own tags to secrets management (Secrets Manager), kubernetes (EKS), compute, and serverless
 - Engineering blogs (plain RSS, verbatim list): The Pragmatic Engineer, Simon Willison (`/atom/entries/` — essays, not the linkblog), Will Larson (`lethain.com`)
