@@ -16,11 +16,10 @@ topics:
         path_prefix: /engineering/
 
   - name: Cloud (AWS)
+    synthesize: false # AWS headlines are self-explanatory — list them verbatim
     feeds:
       - url: https://aws.amazon.com/about-aws/whats-new/recent/feed/
         name: AWS What's New # the feed titles itself "Recent Announcements"
-        # AWS's own tags, scoped to: secrets management, kubernetes,
-        # compute, serverless
         categories:
           - general:products/aws-secrets-manager
           - general:products/amazon-eks

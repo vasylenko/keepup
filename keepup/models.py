@@ -40,6 +40,7 @@ class TopicDigest:
     items: list[Item]  # selected items, newest first
     stories: list[Story] | None  # None ⇒ synthesis failed ⇒ links-only
     failed_sources: list[str] = field(default_factory=list)
+    synthesize: bool = True  # False ⇒ headlines verbatim, by design not by failure
 
 
 def canonical_url(url: str) -> str:

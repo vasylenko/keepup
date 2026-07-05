@@ -30,7 +30,18 @@
 <section>
   <h2>{{ topic.name }}</h2>
 
-  {% if topic.stories is none %}
+  {% if not topic.synthesize %}
+    {% if not topic.items %}
+    <p class="note">Quiet week.</p>
+    {% else %}
+    <ul>
+      {% for item in topic.items %}
+      <li><a href="{{ item.url }}">{{ item.title }}</a>
+          <span class="meta">{{ item.published.strftime('%b %d') }}</span></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  {% elif topic.stories is none %}
     <p class="note">Synthesis unavailable this week — raw links below.</p>
   {% elif not topic.stories %}
     <p class="note">Quiet week.</p>
@@ -49,7 +60,7 @@
     {% endfor %}
   {% endif %}
 
-  {% if topic.items %}
+  {% if topic.synthesize and topic.items %}
   <details>
     <summary>All {{ topic.items | length }} items this week</summary>
     <ul>

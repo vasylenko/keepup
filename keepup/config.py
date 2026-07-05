@@ -25,6 +25,7 @@ class Topic:
     feeds: list[FeedSource] = field(default_factory=list)
     sitemaps: list[SitemapSource] = field(default_factory=list)
     hn_keywords: list[str] = field(default_factory=list)
+    synthesize: bool = True  # False ⇒ no LLM pass, render headlines verbatim
 
 
 @dataclass
@@ -45,6 +46,7 @@ def load_config(path: str | Path = "config/topics.yml") -> Config:
             ],
             sitemaps=[SitemapSource(s["url"], s["path_prefix"]) for s in t.get("sitemaps", [])],
             hn_keywords=t.get("hn_keywords", []),
+            synthesize=t.get("synthesize", True),
         )
         for t in raw["topics"]
     ]

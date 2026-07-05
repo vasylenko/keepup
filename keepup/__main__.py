@@ -20,11 +20,16 @@ def main() -> None:
     for topic in cfg.topics:
         raw, failed = fetch_topic(topic, since)
         selected = select(dedupe(raw))
-        stories = synthesize(topic.name, selected, cfg.model)
-        outcome = "links-only" if stories is None else f"{len(stories)} stories"
+        stories = synthesize(topic.name, selected, cfg.model) if topic.synthesize else None
+        if not topic.synthesize:
+            outcome = "verbatim headlines"
+        elif stories is None:
+            outcome = "links-only"
+        else:
+            outcome = f"{len(stories)} stories"
         note = f"; failed: {', '.join(failed)}" if failed else ""
         print(f"{topic.name}: {len(raw)} fetched → {len(selected)} selected → {outcome}{note}")
-        digests.append(TopicDigest(topic.name, selected, stories, failed))
+        digests.append(TopicDigest(topic.name, selected, stories, failed, topic.synthesize))
 
     render(digests, week, now)
     print(f"rendered docs/index.html + docs/archive/{week}.html")
