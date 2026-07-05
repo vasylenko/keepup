@@ -16,7 +16,7 @@ A feed reader moves the pile; this shrinks it. The digest must do three things a
 
 ## Solution
 
-GitHub Actions cron (Mon ~05:00 UTC, `workflow_dispatch` for reruns): fetch the week's items from curated sources per topic → deterministic per-topic selection → one LLM call per topic clusters, ranks, and synthesizes → render static HTML into `docs/` → commit to `main`. GitHub Pages serves the branch (`/docs` folder, `.nojekyll`): the commit is the deploy, the archive, and the repo activity that keeps the schedule enabled. Index = latest week; past weeks accumulate at `/archive/2026-Wnn.html`.
+GitHub Actions cron (Mon ~05:00 UTC, `workflow_dispatch` for reruns): fetch the week's items from curated sources per topic → deterministic per-topic selection → per-topic content: publisher-written titles and descriptions verbatim (default for all current topics), or an optional LLM call that clusters, ranks, and synthesizes (`synthesize: true`) → render static HTML into `docs/` → commit to `main`. GitHub Pages serves the branch (`/docs` folder, `.nojekyll`): the commit is the deploy, the archive, and the repo activity that keeps the schedule enabled. Index = latest week; past weeks accumulate at `/archive/2026-Wnn.html`.
 
 ## Non-goals
 
@@ -39,6 +39,8 @@ GitHub Actions cron (Mon ~05:00 UTC, `workflow_dispatch` for reruns): fetch the 
 ```yaml
 topics:
   - name: AI/LLM tooling
+    synthesize: false    # publisher-written descriptions beat LLM rewrites
+    descriptions: true   # one-liner per item, from feed summary / page meta
     feeds:
       - url: https://openai.com/news/rss.xml
         categories: [Engineering, Product]   # narrows a firehose feed to curated sections
@@ -65,7 +67,7 @@ Seed sources (M1):
 
 **Fetchers** — one per source type, all emitting `Item{id, title, url, source, published, excerpt}`:
 - **RSS/Atom**: `feedparser`. Covers blogs and GitHub release feeds (`/releases.atom`); an optional per-feed `categories` filter narrows single-feed sites to curated sections.
-- **Sitemap (RSS-less sites)**: discover URLs via the site's `sitemap.xml` (`requests`; filter by `path_prefix`, shortlist by `lastmod`), then fetch each candidate page with the `markfetch` CLI (markdown on stdout, `[code]` on stderr, non-zero exit). `lastmod` never dates an item (modified ≠ published — a redeploy bumps it sitewide): the item's date comes from the page itself (h1-adjacent date in the raw HTML, else the extracted markdown), and pages without one are dropped.
+- **Sitemap (RSS-less sites)**: discover URLs via the site's `sitemap.xml` (`requests`; filter by `path_prefix`, shortlist by `lastmod`), then fetch each candidate page with the `markfetch` CLI (markdown on stdout, `[code]` on stderr, non-zero exit). `lastmod` never dates an item (modified ≠ published — a redeploy bumps it sitewide): the item's date comes from the page itself (h1-adjacent date in the raw HTML, else the extracted markdown), and pages without one are dropped. The excerpt is the page's own `og:description`/meta description — the publisher's hand-written pitch — falling back to body text.
 - **X (best-effort, M3)**: Nitter-compatible RSS, instance list in config (`xcancel.com` direct + `twiiit.com` redirect discovery), custom User-Agent, per-account tolerance for failure. Adapter interface so a paid API slots in without pipeline changes.
 - **Reddit (M3)**: official OAuth API, free "script" app, plain `requests` against `/r/X/new`.
 - **HN**: Algolia HN Search API — free, no auth, keyword + `created_at_i` week window.
