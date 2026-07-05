@@ -43,7 +43,8 @@
   {% if not topic.items %}
     <p class="note">Quiet week.</p>
   {% elif not topic.synthesize %}
-    {{ item_list(topic.items) }}
+    {# source labels only earn their space when the list mixes sources #}
+    {{ item_list(topic.items, show_source=(topic.items | map(attribute='source') | unique | list | length) > 1) }}
   {% elif topic.stories is none %}
     <p class="note">Synthesis unavailable this week — raw links instead.</p>
     {{ item_list(topic.items, show_source=true) }}

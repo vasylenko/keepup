@@ -18,6 +18,15 @@ topics:
         path_prefix: /engineering/
         name: Anthropic
 
+  - name: Engineering blogs
+    synthesize: false # essay titles speak for themselves
+    feeds:
+      - url: https://newsletter.pragmaticengineer.com/feed
+      - url: https://simonwillison.net/atom/entries/ # long-form only; /everything/ is a linkblog flood
+        name: Simon Willison
+      - url: https://lethain.com/feeds/
+        name: Will Larson
+
   - name: Cloud (AWS)
     synthesize: false # AWS headlines are self-explanatory — list them verbatim
     feeds:
