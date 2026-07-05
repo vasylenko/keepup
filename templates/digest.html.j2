@@ -25,7 +25,7 @@
 {% macro item_list(items, show_source=false) %}
     <ul>
       {% for item in items %}
-      <li><a href="{{ item.url }}">{{ item.title }}</a>
+      <li>{{ item.title }} (<a href="{{ item.url }}">link</a>)
           <span class="meta">{% if show_source %}{{ item.source }} · {% endif %}{{ item.published.strftime('%b %d') }}</span></li>
       {% endfor %}
     </ul>
