@@ -61,8 +61,9 @@ Seed topics: AI/LLM tooling · Engineering blogs · Cloud (AWS) · DevOps/SRE to
 
 Seed sources (M1):
 - OpenAI: `https://openai.com/news/rss.xml` filtered to `Engineering` + `Product` (the feed's labels for the engineering and product-releases sections)
-- Codex: `https://developers.openai.com/codex/changelog/rss.xml` — per-entry anchors on one page, hence canonical URLs keep fragments
-- Claude Code: `https://code.claude.com/docs/en/whats-new/rss.xml` (same anchor-entry style)
+- Codex: `https://developers.openai.com/codex/changelog/rss.xml` — per-entry anchors on one page, hence canonical URLs keep fragments; rolls up under the OpenAI group
+- Claude Code: `https://code.claude.com/docs/en/whats-new/rss.xml` (same anchor-entry style); rolls up under the Anthropic group
+- ChatGPT: `https://openai.com/products/release-notes/` — no RSS; entries live in the page's Next.js RSC payload (parsed for the ChatGPT product), rolls up under OpenAI
 - Anthropic: no RSS — sitemap fetcher against `https://www.anthropic.com/sitemap.xml`, `/news/` and `/engineering/` prefixes
 - AWS: `https://aws.amazon.com/about-aws/whats-new/recent/feed/` filtered by AWS's own tags to secrets management (Secrets Manager), kubernetes (EKS), compute, and serverless
 - Engineering blogs (plain RSS, verbatim list): The Pragmatic Engineer, Simon Willison (`/atom/entries/` — essays, not the linkblog), Will Larson (`lethain.com`)
@@ -73,6 +74,9 @@ Seed sources (M1):
 - **X (best-effort, M3)**: Nitter-compatible RSS, instance list in config (`xcancel.com` direct + `twiiit.com` redirect discovery), custom User-Agent, per-account tolerance for failure. Adapter interface so a paid API slots in without pipeline changes.
 - **Reddit (M3)**: official OAuth API, free "script" app, plain `requests` against `/r/X/new`.
 - **HN**: Algolia HN Search API — free, no auth, keyword + `created_at_i` week window.
+- **OpenAI release notes**: no RSS; entries are structured rows in the page's Next.js RSC payload (`requests` — its HTTP/1.1 fingerprint passes the edge check that rejects HTTP/2 clients), filtered by `product`.
+
+Each source has an optional `group` so products roll up under their vendor (Codex, ChatGPT → OpenAI; Claude Code → Anthropic); the render groups by vendor.
 
 **Pipeline** (single Python run):
 1. Fetch all sources, 7-day window by published date (undated items are dropped); per-source timeout; a failing source never fails the run — it's skipped and footnoted.
