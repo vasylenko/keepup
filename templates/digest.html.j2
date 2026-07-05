@@ -56,15 +56,17 @@
 <section>
   <h2>{{ topic.name }}</h2>
 
-  {% if not topic.items %}
-    <p class="note">Quiet week.</p>
-  {% elif not topic.synthesize or topic.stories is none %}
-    {% if topic.synthesize %}
+  {% if not topic.synthesize or topic.stories is none %}
+    {% if topic.synthesize and topic.items %}
     <p class="note">Synthesis unavailable this week — raw links instead.</p>
     {% endif %}
     {% for source, items in items_by_source[topic.name].items() %}
     <h3>{{ source }}</h3>
+    {% if items %}
     {{ item_list(items, show_desc=topic.descriptions) }}
+    {% else %}
+    <p class="note">Nothing posted last week.</p>
+    {% endif %}
     {% endfor %}
   {% elif not topic.stories %}
     <p class="note">Quiet week.</p>

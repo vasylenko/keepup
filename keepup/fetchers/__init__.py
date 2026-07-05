@@ -21,13 +21,13 @@ def fetch_topic(topic: Topic, since: datetime) -> tuple[list[Item], list[str]]:
         try:
             items += rss.fetch_feed(feed.url, since, feed.categories, feed.name)
         except Exception as exc:
-            failed.append(f"{urlsplit(feed.url).netloc} ({exc.__class__.__name__})")
+            failed.append(f"{feed.display} ({exc.__class__.__name__})")
 
     for source in topic.sitemaps:
         try:
             items += sitemap.fetch_sitemap(source.url, source.path_prefix, since, source.name)
         except Exception as exc:
-            failed.append(f"{urlsplit(source.url).netloc} ({exc.__class__.__name__})")
+            failed.append(f"{source.display} ({exc.__class__.__name__})")
 
     if topic.hn_keywords:
         try:

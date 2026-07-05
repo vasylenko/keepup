@@ -25,6 +25,7 @@ topics:
     descriptions: true
     feeds:
       - url: https://newsletter.pragmaticengineer.com/feed
+        name: The Pragmatic Engineer # keeps the quiet-week label consistent
       - url: https://simonwillison.net/atom/entries/ # long-form only; /everything/ is a linkblog flood
         name: Simon Willison
       - url: https://lethain.com/feeds/

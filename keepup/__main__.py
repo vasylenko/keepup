@@ -31,7 +31,13 @@ def main() -> None:
         print(f"{topic.name}: {len(raw)} fetched → {len(selected)} selected → {outcome}{note}")
         digests.append(
             TopicDigest(
-                topic.name, selected, stories, failed, topic.synthesize, topic.descriptions
+                topic.name,
+                selected,
+                stories,
+                failed,
+                topic.synthesize,
+                topic.descriptions,
+                topic.source_names(),
             )
         )
 

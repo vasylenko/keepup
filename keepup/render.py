@@ -48,6 +48,13 @@ def render(
         item_groups: dict[str, list] = {}
         for item in t.items:  # already newest-first
             item_groups.setdefault(item.source, []).append(item)
+        # Quiet sources still get a group (rendered as a one-line note) —
+        # unless they outright failed, which the footnote already covers.
+        failed_names = {f.split(" (")[0] for f in t.failed_sources}
+        for name in t.sources:
+            present = any(name in group.split(" + ") for group in item_groups)
+            if not present and name not in failed_names:
+                item_groups[name] = []
         items_by_source[t.name] = item_groups
     env = Environment(loader=FileSystemLoader(templates), autoescape=select_autoescape())
     env.filters["first_sentence"] = first_sentence
