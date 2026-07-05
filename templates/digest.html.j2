@@ -5,30 +5,41 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>keepup — {{ week }}</title>
 <style>
+  /* Two-family system: serif for reading prose, sans for structure
+     (headers, meta). Sizes step down h1→h3 so the source kickers never
+     compete with content; body measure ≈ 70ch for comfortable scanning. */
   :root { color-scheme: light dark; }
-  body { max-width: 46rem; margin: 2rem auto; padding: 0 1rem;
-         font: 16px/1.6 system-ui, sans-serif; }
-  h1 { margin-bottom: 0; }
-  h2 { margin-top: 2.5rem; border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent); padding-bottom: .3rem; }
-  h3 { margin-bottom: .2rem; }
-  h4 { margin: 1rem 0 .2rem; font-size: 1em; }
-  .vendor { margin-top: 1.6rem; opacity: .85; }
-  article p { margin: .2rem 0; }
-  .meta, .note, .footnote { opacity: .65; font-size: .9em; }
-  .desc { display: block; opacity: .75; font-size: .92em; }
-  ul li { margin-bottom: .5rem; }
+  body { max-width: 42rem; margin: 2.5rem auto 4rem; padding: 0 1.25rem;
+         font: 17px/1.65 Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif; }
+  h1, h2, h3, h4, .meta, .note, .footnote, .links, header p, footer {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; }
+  h1 { font-size: 1.5rem; margin-bottom: 0; }
+  h2 { font-size: 1.2rem; margin: 2.8rem 0 .4rem; padding-bottom: .35rem;
+       border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent); }
+  h3 { font-size: .78rem; font-weight: 600; text-transform: uppercase;
+       letter-spacing: .09em; opacity: .6; margin: 1.7rem 0 .5rem; }
+  h4 { font-size: 1.02rem; margin: 1.1rem 0 .15rem; }
+  article p { margin: .15rem 0; }
+  ul { padding-left: 1.2rem; margin: .4rem 0; }
+  li { margin-bottom: .6rem; }
+  a { color: inherit;
+      text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+      text-underline-offset: 2px; }
+  a:hover { text-decoration-color: currentColor; }
+  .meta { opacity: .6; font-size: .8rem; }
+  .desc { display: block; opacity: .78; font-size: .93em; }
+  .note, .footnote { opacity: .65; font-size: .85rem; }
+  .links { font-size: .8rem; }
   .links a { margin-right: .8em; }
-  details { margin-top: 1.2rem; }
-  summary { cursor: pointer; opacity: .8; }
-  footer { margin-top: 3rem; font-size: .9em; opacity: .8; }
+  footer { margin-top: 3.5rem; font-size: .85rem; opacity: .75; }
   footer a { margin-right: .8em; }
 </style>
 </head>
-{% macro item_list(items, show_source=false, show_desc=false) %}
+{% macro item_list(items, show_desc=false) %}
     <ul>
       {% for item in items %}
       <li>{{ item.title }} (<a href="{{ item.url }}">link</a>)
-          <span class="meta">{% if show_source %}{{ item.source }} · {% endif %}{{ item.published.strftime('%b %d') }}</span>
+          <span class="meta">{{ item.published.strftime('%b %d') }}</span>
           {%- if show_desc and item.excerpt %}
           <span class="desc">{{ item.excerpt | first_sentence }}</span>
           {%- endif %}</li>
@@ -47,19 +58,19 @@
 
   {% if not topic.items %}
     <p class="note">Quiet week.</p>
-  {% elif not topic.synthesize %}
-    {# source labels only earn their space when the list mixes sources #}
-    {{ item_list(topic.items,
-                 show_source=(topic.items | map(attribute='source') | unique | list | length) > 1,
-                 show_desc=topic.descriptions) }}
-  {% elif topic.stories is none %}
+  {% elif not topic.synthesize or topic.stories is none %}
+    {% if topic.synthesize %}
     <p class="note">Synthesis unavailable this week — raw links instead.</p>
-    {{ item_list(topic.items, show_source=true) }}
+    {% endif %}
+    {% for source, items in items_by_source[topic.name].items() %}
+    <h3>{{ source }}</h3>
+    {{ item_list(items, show_desc=topic.descriptions) }}
+    {% endfor %}
   {% elif not topic.stories %}
     <p class="note">Quiet week.</p>
   {% else %}
     {% for vendor, stories in stories_by_vendor[topic.name].items() %}
-    <h3 class="vendor">{{ vendor }}</h3>
+    <h3>{{ vendor }}</h3>
     {% for story in stories %}
     <article>
       <h4>{{ story.headline }}</h4>
