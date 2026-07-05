@@ -46,11 +46,15 @@ class TopicDigest:
 
 
 def canonical_url(url: str) -> str:
-    """Normalize a URL so duplicates across sources share one identity."""
-    scheme, netloc, path, query, _ = urlsplit(url.strip())
+    """Normalize a URL so duplicates across sources share one identity.
+
+    Fragments are kept: changelog feeds identify entries by anchor on one
+    page, so stripping them would collapse a whole changelog into one item.
+    """
+    scheme, netloc, path, query, fragment = urlsplit(url.strip())
     kept = [(k, v) for k, v in parse_qsl(query) if not _TRACKING_PARAMS.match(k)]
     return urlunsplit(
-        (scheme.lower(), netloc.lower(), path.rstrip("/") or "/", urlencode(kept), "")
+        (scheme.lower(), netloc.lower(), path.rstrip("/") or "/", urlencode(kept), fragment)
     )
 
 
