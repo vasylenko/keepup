@@ -19,7 +19,8 @@ topics:
         name: Anthropic
 
   - name: Engineering blogs
-    synthesize: false # essay titles speak for themselves
+    synthesize: false # no LLM pass; feed summaries provide the one-liners
+    descriptions: true
     feeds:
       - url: https://newsletter.pragmaticengineer.com/feed
       - url: https://simonwillison.net/atom/entries/ # long-form only; /everything/ is a linkblog flood

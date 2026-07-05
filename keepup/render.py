@@ -5,12 +5,19 @@ docs/archive/<week>.html (accumulates) — rendered per location because
 relative links differ between the two.
 """
 
+import re
 from datetime import datetime
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from keepup.models import TopicDigest
+
+
+def first_sentence(text: str, limit: int = 220) -> str:
+    """One-line description from a feed summary, which may be a whole post body."""
+    match = re.match(r"(.+?[.!?])(?:\s|$)", text)
+    return (match.group(1) if match else text)[:limit]
 
 
 def render(
@@ -37,6 +44,7 @@ def render(
             groups.setdefault(by_id[story.item_ids[0]].source, []).append(story)
         stories_by_vendor[t.name] = groups
     env = Environment(loader=FileSystemLoader(templates), autoescape=select_autoescape())
+    env.filters["first_sentence"] = first_sentence
     template = env.get_template("digest.html.j2")
 
     for target, root in ((docs / "index.html", ""), (archive_dir / f"{week}.html", "../")):

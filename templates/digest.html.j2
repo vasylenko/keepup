@@ -15,6 +15,8 @@
   .vendor { margin-top: 1.6rem; opacity: .85; }
   article p { margin: .2rem 0; }
   .meta, .note, .footnote { opacity: .65; font-size: .9em; }
+  .desc { display: block; opacity: .75; font-size: .92em; }
+  ul li { margin-bottom: .5rem; }
   .links a { margin-right: .8em; }
   details { margin-top: 1.2rem; }
   summary { cursor: pointer; opacity: .8; }
@@ -22,11 +24,14 @@
   footer a { margin-right: .8em; }
 </style>
 </head>
-{% macro item_list(items, show_source=false) %}
+{% macro item_list(items, show_source=false, show_desc=false) %}
     <ul>
       {% for item in items %}
       <li>{{ item.title }} (<a href="{{ item.url }}">link</a>)
-          <span class="meta">{% if show_source %}{{ item.source }} · {% endif %}{{ item.published.strftime('%b %d') }}</span></li>
+          <span class="meta">{% if show_source %}{{ item.source }} · {% endif %}{{ item.published.strftime('%b %d') }}</span>
+          {%- if show_desc and item.excerpt %}
+          <span class="desc">{{ item.excerpt | first_sentence }}</span>
+          {%- endif %}</li>
       {% endfor %}
     </ul>
 {% endmacro %}
@@ -44,7 +49,9 @@
     <p class="note">Quiet week.</p>
   {% elif not topic.synthesize %}
     {# source labels only earn their space when the list mixes sources #}
-    {{ item_list(topic.items, show_source=(topic.items | map(attribute='source') | unique | list | length) > 1) }}
+    {{ item_list(topic.items,
+                 show_source=(topic.items | map(attribute='source') | unique | list | length) > 1,
+                 show_desc=topic.descriptions) }}
   {% elif topic.stories is none %}
     <p class="note">Synthesis unavailable this week — raw links instead.</p>
     {{ item_list(topic.items, show_source=true) }}

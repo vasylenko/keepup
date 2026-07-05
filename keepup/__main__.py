@@ -29,7 +29,11 @@ def main() -> None:
             outcome = f"{len(stories)} stories"
         note = f"; failed: {', '.join(failed)}" if failed else ""
         print(f"{topic.name}: {len(raw)} fetched → {len(selected)} selected → {outcome}{note}")
-        digests.append(TopicDigest(topic.name, selected, stories, failed, topic.synthesize))
+        digests.append(
+            TopicDigest(
+                topic.name, selected, stories, failed, topic.synthesize, topic.descriptions
+            )
+        )
 
     render(digests, week, now)
     print(f"rendered docs/index.html + docs/archive/{week}.html")
