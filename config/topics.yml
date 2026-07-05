@@ -14,6 +14,8 @@ topics:
         categories: [Engineering, Product]
       - url: https://developers.openai.com/codex/changelog/rss.xml
         name: Codex changelog
+      - url: https://code.claude.com/docs/en/whats-new/rss.xml
+        name: Claude Code
     sitemaps: # Anthropic has no RSS
       - url: https://www.anthropic.com/sitemap.xml
         path_prefix: /news/
