@@ -1,6 +1,6 @@
 # Curated sources per topic — the single hand-edited input to the pipeline.
 llm:
-  model: openai/gpt-4.1-mini
+  model: openai/gpt-4.1 # free "high" tier: 50 req/day — we use ~1/week
 
 topics:
   - name: AI/LLM tooling
