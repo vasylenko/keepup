@@ -37,7 +37,8 @@ def main() -> None:
                 failed,
                 topic.synthesize,
                 topic.descriptions,
-                topic.source_names(),
+                topic.group_roster(),
+                topic.group_of(),
             )
         )
 

@@ -11,15 +11,22 @@ def _display(url: str, name: str) -> str:
     return name or urlsplit(url).netloc.removeprefix("www.")
 
 
+# group defaults to the source's own name — a source is its own group unless it
+# rolls up under a vendor (Codex → OpenAI, Claude Code → Anthropic).
 @dataclass
 class FeedSource:
     url: str
     categories: list[str] = field(default_factory=list)  # empty ⇒ take all entries
     name: str = ""  # display name when the feed's own title is unhelpful
+    group: str = ""
 
     @property
     def display(self) -> str:
         return _display(self.url, self.name)
+
+    @property
+    def group_name(self) -> str:
+        return self.group or self.display
 
 
 @dataclass
@@ -27,10 +34,33 @@ class SitemapSource:
     url: str
     path_prefix: str
     name: str = ""  # display name when the bare hostname is unhelpful
+    group: str = ""
 
     @property
     def display(self) -> str:
         return _display(self.url, self.name)
+
+    @property
+    def group_name(self) -> str:
+        return self.group or self.display
+
+
+@dataclass
+class ReleaseNotesSource:
+    """OpenAI's release-notes page: a Next.js RSC payload, filtered by product."""
+
+    url: str
+    products: list[str] = field(default_factory=list)
+    name: str = ""
+    group: str = ""
+
+    @property
+    def display(self) -> str:
+        return _display(self.url, self.name)
+
+    @property
+    def group_name(self) -> str:
+        return self.group or self.display
 
 
 @dataclass
@@ -38,17 +68,29 @@ class Topic:
     name: str
     feeds: list[FeedSource] = field(default_factory=list)
     sitemaps: list[SitemapSource] = field(default_factory=list)
+    release_notes: list[ReleaseNotesSource] = field(default_factory=list)
     hn_keywords: list[str] = field(default_factory=list)
     synthesize: bool = True  # False ⇒ no LLM pass, render headlines verbatim
     descriptions: bool = False  # verbatim lists: one-line description per item
 
-    def source_names(self) -> list[str]:
-        """The full display roster — quiet sources still appear on the page."""
-        names = [f.display for f in self.feeds]
-        names += [s.display for s in self.sitemaps if s.display not in names]
+    def group_of(self) -> dict[str, str]:
+        """Map each source's display name to its parent group (for rendering)."""
+        mapping = {s.display: s.group_name for s in self._sources}
         if self.hn_keywords:
-            names.append("Hacker News")
-        return names
+            mapping["Hacker News"] = "Hacker News"
+        return mapping
+
+    def group_roster(self) -> list[str]:
+        """Ordered unique parent groups — every one appears on the page weekly."""
+        roster: list[str] = []
+        for group in self.group_of().values():
+            if group not in roster:
+                roster.append(group)
+        return roster
+
+    @property
+    def _sources(self) -> list:
+        return [*self.feeds, *self.sitemaps, *self.release_notes]
 
 
 @dataclass
@@ -64,12 +106,18 @@ def load_config(path: str | Path = "config/topics.yml") -> Config:
         Topic(
             name=t["name"],
             feeds=[
-                FeedSource(f["url"], f.get("categories", []), f.get("name", ""))
+                FeedSource(f["url"], f.get("categories", []), f.get("name", ""), f.get("group", ""))
                 for f in t.get("feeds", [])
             ],
             sitemaps=[
-                SitemapSource(s["url"], s["path_prefix"], s.get("name", ""))
+                SitemapSource(s["url"], s["path_prefix"], s.get("name", ""), s.get("group", ""))
                 for s in t.get("sitemaps", [])
+            ],
+            release_notes=[
+                ReleaseNotesSource(
+                    r["url"], r.get("products", []), r.get("name", ""), r.get("group", "")
+                )
+                for r in t.get("release_notes", [])
             ],
             hn_keywords=t.get("hn_keywords", []),
             synthesize=t.get("synthesize", True),

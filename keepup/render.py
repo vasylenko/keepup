@@ -34,27 +34,32 @@ def render(
     past_weeks = sorted(
         (p.stem for p in archive_dir.glob("*.html") if p.stem != week), reverse=True
     )
-    # Every topic renders as source-grouped content (h2 topic → h3 source):
-    # stories group by their lead item's source with LLM rank order preserved;
-    # verbatim items group by source, groups ordered by their newest item.
+    # Every topic renders topic (h2) → parent group (h3) → content. Child
+    # sources (Codex, Claude Code) roll up under their vendor group; stories
+    # keep LLM rank order within a group.
     stories_by_vendor: dict[str, dict[str, list]] = {}
     items_by_source: dict[str, dict[str, list]] = {}
     for t in digests:
         by_id = {i.id: i for i in t.items}
+
+        def group_for(source: str, mapping=t.group_of) -> str:
+            head = source.split(" + ")[0]  # dedupe may join sources
+            return mapping.get(head, source)
+
         story_groups: dict[str, list] = {}
         for story in t.stories or []:
-            story_groups.setdefault(by_id[story.item_ids[0]].source, []).append(story)
+            story_groups.setdefault(group_for(by_id[story.item_ids[0]].source), []).append(story)
         stories_by_vendor[t.name] = story_groups
+
         item_groups: dict[str, list] = {}
         for item in t.items:  # already newest-first
-            item_groups.setdefault(item.source, []).append(item)
-        # Quiet sources still get a group (rendered as a one-line note) —
-        # unless they outright failed, which the footnote already covers.
-        failed_names = {f.split(" (")[0] for f in t.failed_sources}
-        for name in t.sources:
-            present = any(name in group.split(" + ") for group in item_groups)
-            if not present and name not in failed_names:
-                item_groups[name] = []
+            item_groups.setdefault(group_for(item.source), []).append(item)
+        # A group with no items still appears with a quiet note — unless every
+        # source in it failed, which the footnote already covers.
+        failed_groups = {group_for(f.split(" (")[0]) for f in t.failed_sources}
+        for group in t.groups:
+            if group not in item_groups and group not in failed_groups:
+                item_groups[group] = []
         items_by_source[t.name] = item_groups
     env = Environment(loader=FileSystemLoader(templates), autoescape=select_autoescape())
     env.filters["first_sentence"] = first_sentence

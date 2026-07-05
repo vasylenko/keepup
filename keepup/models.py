@@ -42,7 +42,8 @@ class TopicDigest:
     failed_sources: list[str] = field(default_factory=list)
     synthesize: bool = True  # False ⇒ headlines verbatim, by design not by failure
     descriptions: bool = False  # verbatim lists: one-line description per item
-    sources: list[str] = field(default_factory=list)  # full roster, incl. quiet ones
+    groups: list[str] = field(default_factory=list)  # parent-group roster, quiet ones included
+    group_of: dict[str, str] = field(default_factory=dict)  # source display name → parent group
 
 
 def canonical_url(url: str) -> str:
