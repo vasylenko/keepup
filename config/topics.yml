@@ -6,14 +6,17 @@ topics:
   - name: AI/LLM tooling
     feeds:
       - url: https://openai.com/news/rss.xml
+        name: OpenAI
         # openai.com/news/engineering + /news/product-releases; the feed
         # labels those sections Engineering and Product
         categories: [Engineering, Product]
     sitemaps: # Anthropic has no RSS
       - url: https://www.anthropic.com/sitemap.xml
         path_prefix: /news/
+        name: Anthropic
       - url: https://www.anthropic.com/sitemap.xml
         path_prefix: /engineering/
+        name: Anthropic
 
   - name: Cloud (AWS)
     synthesize: false # AWS headlines are self-explanatory — list them verbatim

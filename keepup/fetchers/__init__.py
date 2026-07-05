@@ -25,7 +25,7 @@ def fetch_topic(topic: Topic, since: datetime) -> tuple[list[Item], list[str]]:
 
     for source in topic.sitemaps:
         try:
-            items += sitemap.fetch_sitemap(source.url, source.path_prefix, since)
+            items += sitemap.fetch_sitemap(source.url, source.path_prefix, since, source.name)
         except Exception as exc:
             failed.append(f"{urlsplit(source.url).netloc} ({exc.__class__.__name__})")
 

@@ -27,6 +27,15 @@ def render(
     past_weeks = sorted(
         (p.stem for p in archive_dir.glob("*.html") if p.stem != week), reverse=True
     )
+    # Stories grouped by the vendor (source) of their lead item, LLM rank
+    # order preserved within and across groups — presentation stays ours.
+    stories_by_vendor: dict[str, dict[str, list]] = {}
+    for t in digests:
+        by_id = {i.id: i for i in t.items}
+        groups: dict[str, list] = {}
+        for story in t.stories or []:
+            groups.setdefault(by_id[story.item_ids[0]].source, []).append(story)
+        stories_by_vendor[t.name] = groups
     env = Environment(loader=FileSystemLoader(templates), autoescape=select_autoescape())
     template = env.get_template("digest.html.j2")
 
@@ -38,6 +47,7 @@ def render(
                 generated=generated,
                 past_weeks=past_weeks,
                 items_by_id={t.name: {i.id: i for i in t.items} for t in digests},
+                stories_by_vendor=stories_by_vendor,
                 root=root,
             )
         )

@@ -11,6 +11,8 @@
   h1 { margin-bottom: 0; }
   h2 { margin-top: 2.5rem; border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent); padding-bottom: .3rem; }
   h3 { margin-bottom: .2rem; }
+  h4 { margin: 1rem 0 .2rem; font-size: 1em; }
+  .vendor { margin-top: 1.6rem; opacity: .85; }
   article p { margin: .2rem 0; }
   .meta, .note, .footnote { opacity: .65; font-size: .9em; }
   .links a { margin-right: .8em; }
@@ -20,6 +22,14 @@
   footer a { margin-right: .8em; }
 </style>
 </head>
+{% macro item_list(items, show_source=false) %}
+    <ul>
+      {% for item in items %}
+      <li><a href="{{ item.url }}">{{ item.title }}</a>
+          <span class="meta">{% if show_source %}{{ item.source }} · {% endif %}{{ item.published.strftime('%b %d') }}</span></li>
+      {% endfor %}
+    </ul>
+{% endmacro %}
 <body>
 <header>
   <h1>keepup</h1>
@@ -30,25 +40,21 @@
 <section>
   <h2>{{ topic.name }}</h2>
 
-  {% if not topic.synthesize %}
-    {% if not topic.items %}
+  {% if not topic.items %}
     <p class="note">Quiet week.</p>
-    {% else %}
-    <ul>
-      {% for item in topic.items %}
-      <li><a href="{{ item.url }}">{{ item.title }}</a>
-          <span class="meta">{{ item.published.strftime('%b %d') }}</span></li>
-      {% endfor %}
-    </ul>
-    {% endif %}
+  {% elif not topic.synthesize %}
+    {{ item_list(topic.items) }}
   {% elif topic.stories is none %}
-    <p class="note">Synthesis unavailable this week — raw links below.</p>
+    <p class="note">Synthesis unavailable this week — raw links instead.</p>
+    {{ item_list(topic.items, show_source=true) }}
   {% elif not topic.stories %}
     <p class="note">Quiet week.</p>
   {% else %}
-    {% for story in topic.stories %}
+    {% for vendor, stories in stories_by_vendor[topic.name].items() %}
+    <h3 class="vendor">{{ vendor }}</h3>
+    {% for story in stories %}
     <article>
-      <h3>{{ story.headline }}</h3>
+      <h4>{{ story.headline }}</h4>
       <p>{{ story.why_it_matters }}</p>
       <p class="links">
         {%- for iid in story.item_ids -%}
@@ -58,18 +64,7 @@
       </p>
     </article>
     {% endfor %}
-  {% endif %}
-
-  {% if topic.synthesize and topic.items %}
-  <details>
-    <summary>All {{ topic.items | length }} items this week</summary>
-    <ul>
-      {% for item in topic.items %}
-      <li><a href="{{ item.url }}">{{ item.title }}</a>
-          <span class="meta">{{ item.source }} · {{ item.published.strftime('%b %d') }}</span></li>
-      {% endfor %}
-    </ul>
-  </details>
+    {% endfor %}
   {% endif %}
 
   {% if topic.failed_sources %}

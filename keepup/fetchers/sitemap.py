@@ -60,7 +60,7 @@ def _markfetch(url: str) -> str | None:
     return result.stdout if result.returncode == 0 else None
 
 
-def fetch_sitemap(url: str, path_prefix: str, since: datetime) -> list[Item]:
+def fetch_sitemap(url: str, path_prefix: str, since: datetime, name: str = "") -> list[Item]:
     """Fetch pages under path_prefix whose content is inside the week window."""
     resp = requests.get(url, headers={"User-Agent": CHROME_UA}, timeout=TIMEOUT)
     resp.raise_for_status()
@@ -100,7 +100,7 @@ def fetch_sitemap(url: str, path_prefix: str, since: datetime) -> list[Item]:
             make_item(
                 title=title,
                 url=loc,
-                source=urlsplit(url).netloc.removeprefix("www."),
+                source=name or urlsplit(url).netloc.removeprefix("www."),
                 published=published,
                 excerpt=body[:500],
             )

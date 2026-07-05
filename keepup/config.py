@@ -17,6 +17,7 @@ class FeedSource:
 class SitemapSource:
     url: str
     path_prefix: str
+    name: str = ""  # display name when the bare hostname is unhelpful
 
 
 @dataclass
@@ -44,7 +45,10 @@ def load_config(path: str | Path = "config/topics.yml") -> Config:
                 FeedSource(f["url"], f.get("categories", []), f.get("name", ""))
                 for f in t.get("feeds", [])
             ],
-            sitemaps=[SitemapSource(s["url"], s["path_prefix"]) for s in t.get("sitemaps", [])],
+            sitemaps=[
+                SitemapSource(s["url"], s["path_prefix"], s.get("name", ""))
+                for s in t.get("sitemaps", [])
+            ],
             hn_keywords=t.get("hn_keywords", []),
             synthesize=t.get("synthesize", True),
         )
