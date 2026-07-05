@@ -5,22 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>keepup — 2026-W27</title>
 <style>
+  /* Two-family system: serif for reading prose, sans for structure
+     (headers, meta). Sizes step down h1→h3 so the source kickers never
+     compete with content; body measure ≈ 70ch for comfortable scanning. */
   :root { color-scheme: light dark; }
-  body { max-width: 46rem; margin: 2rem auto; padding: 0 1rem;
-         font: 16px/1.6 system-ui, sans-serif; }
-  h1 { margin-bottom: 0; }
-  h2 { margin-top: 2.5rem; border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent); padding-bottom: .3rem; }
-  h3 { margin-bottom: .2rem; }
-  h4 { margin: 1rem 0 .2rem; font-size: 1em; }
-  .vendor { margin-top: 1.6rem; opacity: .85; }
-  article p { margin: .2rem 0; }
-  .meta, .note, .footnote { opacity: .65; font-size: .9em; }
-  .desc { display: block; opacity: .75; font-size: .92em; }
-  ul li { margin-bottom: .5rem; }
+  body { max-width: 42rem; margin: 2.5rem auto 4rem; padding: 0 1.25rem;
+         font: 17px/1.65 Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif; }
+  h1, h2, h3, h4, .meta, .note, .footnote, .links, header p, footer {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; }
+  h1 { font-size: 1.5rem; margin-bottom: 0; }
+  h2 { font-size: 1.2rem; margin: 2.8rem 0 .4rem; padding-bottom: .35rem;
+       border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent); }
+  h3 { font-size: .78rem; font-weight: 600; text-transform: uppercase;
+       letter-spacing: .09em; opacity: .6; margin: 1.7rem 0 .5rem; }
+  h4 { font-size: 1.02rem; margin: 1.1rem 0 .15rem; }
+  article p { margin: .15rem 0; }
+  ul { padding-left: 1.2rem; margin: .4rem 0; }
+  li { margin-bottom: .6rem; }
+  a { color: inherit;
+      text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+      text-underline-offset: 2px; }
+  a:hover { text-decoration-color: currentColor; }
+  .meta { opacity: .6; font-size: .8rem; }
+  .desc { display: block; opacity: .78; font-size: .93em; }
+  .note, .footnote { opacity: .65; font-size: .85rem; }
+  .links { font-size: .8rem; }
   .links a { margin-right: .8em; }
-  details { margin-top: 1.2rem; }
-  summary { cursor: pointer; opacity: .8; }
-  footer { margin-top: 3rem; font-size: .9em; opacity: .8; }
+  footer { margin-top: 3.5rem; font-size: .85rem; opacity: .75; }
   footer a { margin-right: .8em; }
 </style>
 </head>
@@ -28,7 +39,7 @@
 <body>
 <header>
   <h1>keepup</h1>
-  <p class="meta">Week 2026-W27 · generated Jul 05, 2026 17:25 UTC</p>
+  <p class="meta">Week 2026-W27 · generated Jul 05, 2026 18:52 UTC</p>
 </header>
 
 
@@ -37,32 +48,32 @@
 
   
     
-    <h3 class="vendor">Anthropic</h3>
+    <h3>Anthropic</h3>
     
     <article>
-      <h4>Anthropic redeploys Claude Fable 5 globally with enhanced cybersecurity safeguards</h4>
-      <p>After export control restrictions limited access, Anthropic has restored global availability of Claude Fable 5, providing detailed information on new cybersecurity measures and a jailbreak framework. This update is crucial for engineers relying on secure, accessible AI models for development and deployment.</p>
-      <p class="links"><a href="https://www.anthropic.com/news/fable-safeguards-jailbreak-framework" title="More details on Fable 5’s cyber safeguards and our jailbreak framework">Anthropic</a><a href="https://www.anthropic.com/news/redeploying-fable-5" title="Redeploying Claude Fable 5">Anthropic</a></p>
+      <h4>Anthropic redeploys Claude Fable 5 and shares details on its cybersecurity safeguards and jailbreak framework.</h4>
+      <p>Claude Fable 5, previously restricted due to US export controls, is now globally available again. Anthropic also disclosed technical details about its cyber protections and jailbreak mitigation, which are relevant for engineers concerned with model robustness and compliance.</p>
+      <p class="links"><a href="https://www.anthropic.com/news/redeploying-fable-5" title="Redeploying Claude Fable 5">Anthropic</a><a href="https://www.anthropic.com/news/fable-safeguards-jailbreak-framework" title="More details on Fable 5’s cyber safeguards and our jailbreak framework">Anthropic</a></p>
     </article>
     
     <article>
-      <h4>Anthropic releases Claude Sonnet 5, an agentic AI model with autonomous capabilities</h4>
-      <p>Claude Sonnet 5 advances agentic AI by enabling autonomous planning and tool use, such as browsing and terminal operations, at a lower cost and smaller scale than previous models. This marks a significant step for developers building autonomous AI agents.</p>
+      <h4>Anthropic launches Claude Sonnet 5, a more agentic and autonomous AI model.</h4>
+      <p>Claude Sonnet 5 introduces improved planning, tool use, and autonomous operation, enabling developers to build more capable agentic applications without needing larger, costlier models. This marks a shift in accessible agentic AI capabilities for engineering teams.</p>
       <p class="links"><a href="https://www.anthropic.com/news/claude-sonnet-5" title="Introducing Claude Sonnet 5">Anthropic</a></p>
     </article>
     
     <article>
-      <h4>Anthropic launches Claude Science, an AI workbench tailored for scientific research</h4>
-      <p>Claude Science aims to accelerate scientific discovery and healthcare innovation by integrating AI capabilities with scientific ecosystems and model improvements. Engineers in life sciences and healthcare can leverage this specialized tool to enhance research productivity.</p>
+      <h4>Anthropic announces Claude Science, an AI workbench for scientific and healthcare research.</h4>
+      <p>Claude Science aims to accelerate scientific discovery by providing tailored AI tools for researchers, integrating with scientific workflows and enhancing model capabilities for life sciences. Engineers in scientific domains may find new opportunities for automation and collaboration.</p>
       <p class="links"><a href="https://www.anthropic.com/news/claude-science-ai-workbench" title="Claude Science, an AI workbench for scientists">Anthropic</a></p>
     </article>
     
     
-    <h3 class="vendor">OpenAI</h3>
+    <h3>OpenAI</h3>
     
     <article>
-      <h4>OpenAI engineers use large-scale core dump analysis to fix an 18-year-old infrastructure bug</h4>
-      <p>By analyzing core dumps at scale, OpenAI identified both a hardware fault and a longstanding software bug causing rare crashes, demonstrating the value of deep diagnostic methods for improving system reliability. This insight is relevant for engineers maintaining complex AI infrastructure.</p>
+      <h4>OpenAI engineers fix an 18-year-old infrastructure bug using large-scale core dump analysis.</h4>
+      <p>By leveraging AI and large-scale analysis, OpenAI resolved a rare crash caused by both hardware and software faults, demonstrating the value of advanced debugging techniques for maintaining reliable AI infrastructure.</p>
       <p class="links"><a href="https://openai.com/index/core-dump-epidemiology-data-infrastructure-bug" title="Core dump epidemiology: fixing an 18-year-old bug">OpenAI</a></p>
     </article>
     
@@ -78,26 +89,36 @@
   
     
     
+    <h3>Simon Willison</h3>
+    
     <ul>
       
       <li>sqlite-utils 4.0rc2, mostly written by Claude Fable (for about $149.25) (<a href="https://simonwillison.net/2026/Jul/5/sqlite-utils-fable">link</a>)
-          <span class="meta">Simon Willison · Jul 05</span>
+          <span class="meta">Jul 05</span>
           <span class="desc">I wrote about the sqlite-utils 4.0rc1 release a couple of weeks ago.</span></li>
       
-      <li>How Kent Beck shapes the software engineering industry (<a href="https://newsletter.pragmaticengineer.com/p/how-kent-beck-shapes-the-software">link</a>)
-          <span class="meta">The Pragmatic Engineer · Jul 01</span>
-          <span class="desc">Kent Beck reflects on Agile, TDD, and why building trust—not just generating code—will define the future of software engineering in the AI era.</span></li>
-      
-      <li>Impressions from visiting OpenAI, Anthropic, & Cursor (<a href="https://newsletter.pragmaticengineer.com/p/impressions-from-visiting-openai">link</a>)
-          <span class="meta">The Pragmatic Engineer · Jun 30</span>
-          <span class="desc">A peek into where software engineering is headed from inside the sector’s leading AI labs.</span></li>
-      
       <li>Have your agent record video demos of its work with shot-scraper video (<a href="https://simonwillison.net/2026/Jun/30/shot-scraper-video">link</a>)
-          <span class="meta">Simon Willison · Jun 30</span>
+          <span class="meta">Jun 30</span>
           <span class="desc">shot-scraper video is a new command introduced in today's shot-scraper 1.10 release which accepts a storyboard.yml file defining a routine to run against a web application and uses Playwright to record a video of that ro</span></li>
       
     </ul>
 
+    
+    <h3>The Pragmatic Engineer</h3>
+    
+    <ul>
+      
+      <li>How Kent Beck shapes the software engineering industry (<a href="https://newsletter.pragmaticengineer.com/p/how-kent-beck-shapes-the-software">link</a>)
+          <span class="meta">Jul 01</span>
+          <span class="desc">Kent Beck reflects on Agile, TDD, and why building trust—not just generating code—will define the future of software engineering in the AI era.</span></li>
+      
+      <li>Impressions from visiting OpenAI, Anthropic, & Cursor (<a href="https://newsletter.pragmaticengineer.com/p/impressions-from-visiting-openai">link</a>)
+          <span class="meta">Jun 30</span>
+          <span class="desc">A peek into where software engineering is headed from inside the sector’s leading AI labs.</span></li>
+      
+    </ul>
+
+    
   
 
   
@@ -108,6 +129,8 @@
 
   
     
+    
+    <h3>AWS What's New</h3>
     
     <ul>
       
@@ -146,6 +169,7 @@
       
     </ul>
 
+    
   
 
   
