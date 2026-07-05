@@ -12,6 +12,8 @@ topics:
         # openai.com/news/engineering + /news/product-releases; the feed
         # labels those sections Engineering and Product
         categories: [Engineering, Product]
+      - url: https://developers.openai.com/codex/changelog/rss.xml
+        name: Codex changelog
     sitemaps: # Anthropic has no RSS
       - url: https://www.anthropic.com/sitemap.xml
         path_prefix: /news/
