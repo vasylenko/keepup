@@ -14,8 +14,10 @@ topics:
         categories: [Engineering, Product]
       - url: https://developers.openai.com/codex/changelog/rss.xml
         name: Codex changelog
+        group: OpenAI # Codex is an OpenAI product
       - url: https://code.claude.com/docs/en/whats-new/rss.xml
         name: Claude Code
+        group: Anthropic # Claude Code is an Anthropic product
     sitemaps: # Anthropic has no RSS
       - url: https://www.anthropic.com/sitemap.xml
         path_prefix: /news/
@@ -23,6 +25,11 @@ topics:
       - url: https://www.anthropic.com/sitemap.xml
         path_prefix: /engineering/
         name: Anthropic
+    release_notes: # no RSS; ChatGPT changelog behind a Next.js RSC page
+      - url: https://openai.com/products/release-notes/
+        products: [chatgpt] # Codex covered by its own changelog feed above
+        name: ChatGPT release notes
+        group: OpenAI
 
   - name: Engineering blogs
     synthesize: false # no LLM pass; feed summaries provide the one-liners
