@@ -5,10 +5,9 @@ renderer footnotes it.
 """
 
 from datetime import datetime
-from urllib.parse import urlsplit
 
 from keepup.config import Topic
-from keepup.fetchers import hn, rss, sitemap
+from keepup.fetchers import hn, openai_releasenotes, rss, sitemap
 from keepup.models import Item
 
 
@@ -26,6 +25,14 @@ def fetch_topic(topic: Topic, since: datetime) -> tuple[list[Item], list[str]]:
     for source in topic.sitemaps:
         try:
             items += sitemap.fetch_sitemap(source.url, source.path_prefix, since, source.name)
+        except Exception as exc:
+            failed.append(f"{source.display} ({exc.__class__.__name__})")
+
+    for source in topic.release_notes:
+        try:
+            items += openai_releasenotes.fetch_release_notes(
+                source.url, source.products, since, source.display
+            )
         except Exception as exc:
             failed.append(f"{source.display} ({exc.__class__.__name__})")
 
