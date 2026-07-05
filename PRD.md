@@ -48,6 +48,7 @@ topics:
       - url: https://www.anthropic.com/sitemap.xml
         path_prefix: /engineering/
   - name: Cloud (AWS)
+    synthesize: false   # AWS headlines are self-explanatory — list them verbatim
     feeds:
       - url: https://aws.amazon.com/about-aws/whats-new/recent/feed/
         categories: [general:products/amazon-eks, marketing:marchitecture/serverless, …]
@@ -71,7 +72,7 @@ Seed sources (M1):
 **Pipeline** (single Python run):
 1. Fetch all sources, 7-day window by published date (undated items are dropped); per-source timeout; a failing source never fails the run — it's skipped and footnoted.
 2. Normalize; dedupe by canonical URL (strip tracking params).
-3. Per topic: **select** ≤40 items by newest-first round-robin across sources, so a single high-volume feed can't crowd out the cross-source echoes ranking depends on. One chat-completions call to GitHub Models (OpenAI-compatible, `https://models.github.ai/inference`); excerpt budget derives from the free tier's 8k-in/4k-out per-request cap. LLM failure ⇒ that topic renders links-only.
+3. Per topic: **select** ≤40 items by newest-first round-robin across sources, so a single high-volume feed can't crowd out the cross-source echoes ranking depends on. One chat-completions call to GitHub Models (OpenAI-compatible, `https://models.github.ai/inference`); excerpt budget derives from the free tier's 8k-in/4k-out per-request cap. LLM failure ⇒ that topic renders links-only. A topic can opt out of synthesis (`synthesize: false`) — its headlines render verbatim, no LLM pass.
 4. Render (Jinja2) into `docs/`: per topic — ranked stories (headline, why-it-matters, source links) on top, collapsible full link list below. No JS required for reading. Publish = commit `docs/` to `main`; Pages serves from the branch.
 
 **Operations**:
