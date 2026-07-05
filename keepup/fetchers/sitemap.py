@@ -48,6 +48,20 @@ def _page_date(markdown: str) -> datetime | None:
     return _parse_date(match.group(0)) if match else None
 
 
+def _meta_description(html: str) -> str:
+    """The publisher's own summary (og:description / meta description) —
+    hand-written to be the one-line pitch, so it beats anything we derive."""
+    import html as html_entities
+
+    for tag in re.finditer(r"<meta\s[^>]*>", html[:20000], re.I):
+        if not re.search(r"""(?:name|property)=["'](?:og:)?description["']""", tag.group(0), re.I):
+            continue
+        content = re.search(r"""content=["']([^"']+)""", tag.group(0))
+        if content:
+            return html_entities.unescape(content.group(1)).strip()
+    return ""
+
+
 def _markfetch(url: str) -> str | None:
     """Run the markfetch CLI: markdown on stdout, non-zero exit on failure.
 
@@ -84,7 +98,8 @@ def fetch_sitemap(url: str, path_prefix: str, since: datetime, name: str = "") -
         # The page's own date is required; lastmod only shortlists candidates.
         # Trusting lastmod resurfaces years-old posts after a site redeploy.
         page = requests.get(loc, headers={"User-Agent": CHROME_UA}, timeout=TIMEOUT)
-        published = _h1_date(page.text) if page.ok else None
+        page_html = page.text if page.ok else ""
+        published = _h1_date(page_html)
         if published and published < since:
             continue
         markdown = _markfetch(loc)
@@ -102,7 +117,7 @@ def fetch_sitemap(url: str, path_prefix: str, since: datetime, name: str = "") -
                 url=loc,
                 source=name or urlsplit(url).netloc.removeprefix("www."),
                 published=published,
-                excerpt=body[:500],
+                excerpt=_meta_description(page_html) or body[:500],
             )
         )
     return items

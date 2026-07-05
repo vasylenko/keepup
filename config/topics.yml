@@ -4,6 +4,8 @@ llm:
 
 topics:
   - name: AI/LLM tooling
+    synthesize: false # publisher-written descriptions beat LLM rewrites
+    descriptions: true
     feeds:
       - url: https://openai.com/news/rss.xml
         name: OpenAI
