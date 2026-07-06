@@ -6,6 +6,8 @@ Personal weekly tech digest — one static page rebuilt every Monday by GitHub A
 
 Every fetch runs through the `markfetch` CLI via `fetch_raw()` in `keepup/fetchers/markfetch.py` (`markfetch --raw`). Don't add `requests`, `httpx`, or `urllib` — markfetch (Serhii's own npm tool) owns the wire, including the HTTP/1.1 trick that gets past Cloudflare. Consequences: it must be installed to run locally (`npm i -g markfetch`, then `uv run python -m keepup`), and the AWS bucketing call needs `GITHUB_TOKEN` — without it that section falls back to a flat, unsorted list.
 
+The one sanctioned exception is `fetchers/x.py`: X has no unauthenticated read path (free API tier died Feb 2026), so it uses tweepy against the paid v2 API (pay-per-use, billed per post read). It needs `X_BEARER_TOKEN`; without it every X author lands in the failed-sources footnote and the rest of the digest builds fine. Keep reads down: retweets/replies are excluded server-side — don't "enrich" the fetch with extra lookups without checking the per-read bill.
+
 ## Source filters match publishers' own tag strings, not concepts
 
 `categories:` in `config/topics.yml` is compared verbatim against each feed's `<category>` values — `kubernetes` matches nothing unless the feed literally emits that string. Read a feed's real category values before filtering on them. AWS is the trap: it tags some items with only a product slug (`general:products/aws-secrets-manager`) and no `marchitecture` area, so an area-only filter silently drops them.
