@@ -50,10 +50,11 @@ topics:
       - url: https://www.anthropic.com/sitemap.xml
         path_prefix: /engineering/
   - name: Cloud (AWS)
-    synthesize: false   # AWS headlines are self-explanatory — list them verbatim
+    synthesize: false          # headlines stay verbatim
+    buckets: [Containers, Security, Compute]   # LLM sorts items into these
     feeds:
       - url: https://aws.amazon.com/about-aws/whats-new/recent/feed/
-        categories: [general:products/amazon-eks, marketing:marchitecture/serverless, …]
+        categories: [marketing:marchitecture/containers, marketing:marchitecture/compute, marketing:marchitecture/security-identity-and-compliance]
     # …plus hn_keywords / subreddits (M3) / x_accounts (M3) attach those fetchers
 ```
 
@@ -65,7 +66,7 @@ Seed sources (M1):
 - Claude Code: `https://code.claude.com/docs/en/whats-new/rss.xml` (same anchor-entry style); rolls up under the Anthropic group
 - ChatGPT: `https://openai.com/products/release-notes/` — no RSS; entries live in the page's Next.js RSC payload (parsed for the ChatGPT product), rolls up under OpenAI
 - Anthropic: no RSS — sitemap fetcher against `https://www.anthropic.com/sitemap.xml`, `/news/` and `/engineering/` prefixes
-- AWS: `https://aws.amazon.com/about-aws/whats-new/recent/feed/` filtered by AWS's own tags to secrets management (Secrets Manager), kubernetes (EKS), compute, and serverless
+- AWS: `https://aws.amazon.com/about-aws/whats-new/recent/feed/` filtered to AWS's containers/compute/security marchitecture areas, then LLM-sorted into Containers / Security / Compute buckets
 - Engineering blogs (plain RSS, verbatim list): The Pragmatic Engineer, Simon Willison (`/atom/entries/` — essays, not the linkblog), Will Larson (`lethain.com`)
 
 **Transport** — every HTTP fetch goes through the `markfetch` CLI in `--raw` mode (body on stdout, `[code]` on stderr, non-zero exit); it owns the wire (Chrome fingerprint, HTTP/1.1 to slip Cloudflare's HTTP/2 check, redirects, timeouts). keepup does no HTTP itself and parses everything markfetch returns.
@@ -84,7 +85,8 @@ Each source has an optional `group` so products roll up under their vendor (Code
 1. Fetch all sources (via markfetch), 7-day window by published date (undated items are dropped); a failing source never fails the run — it's skipped and footnoted with markfetch's error code.
 2. Normalize; dedupe by canonical URL (strip tracking params).
 3. Per topic: **select** ≤40 items by newest-first round-robin across sources, so a single high-volume feed can't crowd out the cross-source echoes ranking depends on. One chat-completions call to GitHub Models (OpenAI-compatible, `https://models.github.ai/inference`); excerpt budget derives from the free tier's 8k-in/4k-out per-request cap. LLM failure ⇒ that topic renders links-only. A topic can opt out of synthesis (`synthesize: false`) — its headlines render verbatim, no LLM pass.
-4. Render (Jinja2) into `docs/`: one consistent structure everywhere — topic (h2) → source group (h3) → content. Synthesized topics show ranked stories (headline, why-it-matters, source links); opt-out topics list dated headlines verbatim, optionally with a one-line description from the feed summary; a failed synthesis falls back to the same grouped list. A source with no posts still appears with a "Nothing posted last week." note — silence is information. No JS required for reading. Publish = commit `docs/` to `main`; Pages serves from the branch.
+3b. A topic may define `buckets` (e.g. Containers/Security/Compute): one LLM call sorts its verbatim items into those buckets by what each is *about* — cross-cutting cases (a security feature of a container service) go where meaning says, not where AWS's tags do. The LLM only sorts; text stays verbatim. Failure ⇒ the section falls back to its flat source list.
+4. Render (Jinja2) into `docs/`: one consistent structure everywhere — topic (h2) → group (h3: vendor, author, or bucket) → content, ordered by the configured roster (stable week to week). Synthesized topics show ranked stories (headline, why-it-matters, source links); opt-out topics list dated headlines verbatim, optionally with a one-line description from the feed summary; a failed synthesis falls back to the same grouped list. A source with no posts still appears with a "Nothing posted last week." note — silence is information. No JS required for reading. Publish = commit `docs/` to `main`; Pages serves from the branch.
 
 **Operations**:
 - Public repo, public Pages URL (free plan).
