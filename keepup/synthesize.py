@@ -5,14 +5,11 @@ are config, so another backend is a base-URL/key change.
 """
 
 import json
-import os
 from pathlib import Path
 
-from openai import OpenAI
-
+from keepup.llm import client
 from keepup.models import Item, Story
 
-BASE_URL = "https://models.github.ai/inference"
 _PROMPT = Path(__file__).parent / "prompts" / "synthesize.md"
 _EXCERPT_CAP = 300  # keeps 40 items inside the free tier's 8k-token input cap
 _MAX_OUTPUT = 3000  # free tier caps completions at 4k tokens
@@ -34,12 +31,11 @@ def synthesize(topic_name: str, items: list[Item], model: str) -> list[Story] | 
     """
     if not items:
         return []
-    token = os.environ.get("GITHUB_TOKEN")
-    if not token:
+    api = client()
+    if api is None:
         return None
     try:
-        client = OpenAI(base_url=BASE_URL, api_key=token)
-        response = client.chat.completions.create(
+        response = api.chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": _PROMPT.read_text().replace("{topic}", topic_name)},
