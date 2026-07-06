@@ -6,6 +6,8 @@ is priced in: a down or rate-limited week lands the author in the
 failed-sources footnote and nothing else breaks.
 """
 
+import html
+import re
 import time
 from datetime import UTC, datetime
 from textwrap import shorten
@@ -18,6 +20,10 @@ from keepup.fetchers.rss import strip_html
 from keepup.models import Item, make_item
 
 _TITLE_WIDTH = 120  # tweets have no title; the opening words serve as one
+_URL_ONLY = re.compile(r"https?://\S+$")
+# the preview card's title is the <b> that closes an <a>; label and quote
+# attribution <b>s sit outside links
+_CARD_TITLE = re.compile(r"<b>([^<]+)</b>\s*</a>")
 
 
 def _as_x_url(nitter_link: str) -> str:
@@ -56,9 +62,15 @@ def fetch_account(handle: str, since: datetime, name: str = "") -> list[Item]:
             continue
         if entry.get("author", "").lower() != f"@{handle.lower()}":
             continue  # retweet
-        title = entry.get("title", "")
+        title = entry.get("title", "").strip()
         if title.startswith("R to "):
             continue  # thread continuation; the head is its own entry
+        if not title:
+            continue  # wordless quote of another post — retweet-equivalent
+        if _URL_ONLY.fullmatch(title):
+            # a link-only tweet's meaning lives in its preview card
+            card = _CARD_TITLE.search(entry.get("summary", ""))
+            title = html.unescape(card.group(1)).strip() if card else title
         items.append(
             make_item(
                 title=shorten(_undo_mirrors(title), _TITLE_WIDTH, placeholder="…"),
