@@ -6,7 +6,9 @@ Personal weekly tech digest — one static page rebuilt every Monday by GitHub A
 
 Every fetch runs through the `markfetch` CLI via `fetch_raw()` in `keepup/fetchers/markfetch.py` (`markfetch --raw`). Don't add `requests`, `httpx`, or `urllib` — markfetch (Serhii's own npm tool) owns the wire, including the HTTP/1.1 trick that gets past Cloudflare. Consequences: it must be installed to run locally (`npm i -g markfetch`, then `uv run python -m keepup`), and the AWS bucketing call needs `GITHUB_TOKEN` — without it that section falls back to a flat, unsorted list.
 
-The one sanctioned exception is `fetchers/x.py`: X has no unauthenticated read path (free API tier died Feb 2026), so it uses tweepy against the paid v2 API (pay-per-use, billed per post read). It needs `X_BEARER_TOKEN`; without it every X author lands in the failed-sources footnote and the rest of the digest builds fine. Keep reads down: retweets/replies are excluded server-side — don't "enrich" the fetch with extra lookups without checking the per-read bill.
+## X timelines come from nitter.net, not the X API
+
+`fetchers/x.py` reads each author's RSS off nitter.net (a public X mirror) through markfetch — the official API is pay-per-use (~$1 per weekly run was the measured bill; tweepy was tried and reverted). Consequences of leaning on a public instance: feeds are ~20 items deep, so a hyper-prolific author's week may be undercovered; a flaky instance week just footnotes the affected authors; and nitter serves an empty 200 for some lowercase handles when its cache is cold — that's why `dhh` is configured as `handle: DHH` (x.com URLs and the creator filter are case-insensitive, so this is safe). Retweets are dropped by `dc:creator` mismatch and thread continuations by their `R to ` title prefix, leaving original posts + thread heads.
 
 ## Source filters match publishers' own tag strings, not concepts
 
