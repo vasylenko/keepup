@@ -64,11 +64,28 @@ class ReleaseNotesSource:
 
 
 @dataclass
+class XAccountSource:
+    """One X author timeline; each author is their own render group."""
+
+    handle: str
+    name: str = ""  # author's display name; the handle reads poorly as a header
+
+    @property
+    def display(self) -> str:
+        return self.name or f"@{self.handle}"
+
+    @property
+    def group_name(self) -> str:
+        return self.display
+
+
+@dataclass
 class Topic:
     name: str
     feeds: list[FeedSource] = field(default_factory=list)
     sitemaps: list[SitemapSource] = field(default_factory=list)
     release_notes: list[ReleaseNotesSource] = field(default_factory=list)
+    x_accounts: list[XAccountSource] = field(default_factory=list)
     hn_keywords: list[str] = field(default_factory=list)
     descriptions: bool = False  # show a one-line description per item
     buckets: list[str] = field(default_factory=list)  # LLM sorts items into these groups
@@ -90,7 +107,7 @@ class Topic:
 
     @property
     def _sources(self) -> list:
-        return [*self.feeds, *self.sitemaps, *self.release_notes]
+        return [*self.feeds, *self.sitemaps, *self.release_notes, *self.x_accounts]
 
 
 @dataclass
@@ -118,6 +135,9 @@ def load_config(path: str | Path = "config/topics.yml") -> Config:
                     r["url"], r.get("products", []), r.get("name", ""), r.get("group", "")
                 )
                 for r in t.get("release_notes", [])
+            ],
+            x_accounts=[
+                XAccountSource(a["handle"], a.get("name", "")) for a in t.get("x_accounts", [])
             ],
             hn_keywords=t.get("hn_keywords", []),
             descriptions=t.get("descriptions", False),

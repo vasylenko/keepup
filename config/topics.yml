@@ -40,6 +40,39 @@ topics:
       - url: https://lethain.com/feeds/
         name: Will Larson
 
+  - name: X threads
+    # Original posts + thread heads per author; retweets and replies are
+    # excluded in the fetcher. Needs X_BEARER_TOKEN (paid API, per-read billing).
+    x_accounts:
+      - handle: karpathy
+        name: Andrej Karpathy
+      - handle: bcherny
+        name: Boris Cherny
+      - handle: ClaudeDevs
+        name: ClaudeDevs
+      - handle: addyosmani
+        name: Addy Osmani
+      - handle: dhh
+        name: DHH
+      - handle: mitchellh
+        name: Mitchell Hashimoto
+      - handle: ctatedev
+        name: Chris Tate
+      - handle: dexhorthy
+        name: Dex Horthy
+      - handle: trq212
+        name: Thariq
+      - handle: simonw
+        name: Simon Willison
+      - handle: ALEngineered
+        name: Steve Huynh
+      - handle: GergelyOrosz
+        name: Gergely Orosz
+      - handle: ericzakariasson
+        name: Eric Zakariasson
+      - handle: sama
+        name: Sam Altman
+
   - name: Cloud (AWS)
     # Buckets, not source groups: the LLM sorts each item by what it's about,
     # which AWS's overlapping marchitecture tags can't resolve.

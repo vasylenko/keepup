@@ -7,7 +7,7 @@ renderer footnotes it.
 from datetime import datetime
 
 from keepup.config import Topic
-from keepup.fetchers import hn, openai_releasenotes, rss, sitemap
+from keepup.fetchers import hn, openai_releasenotes, rss, sitemap, x
 from keepup.models import Item
 
 
@@ -35,6 +35,12 @@ def fetch_topic(topic: Topic, since: datetime) -> tuple[list[Item], list[str]]:
             )
         except Exception as exc:
             failed.append(f"{source.display} ({exc})")
+
+    for account in topic.x_accounts:
+        try:
+            items += x.fetch_account(account.handle, since, account.display)
+        except Exception as exc:
+            failed.append(f"{account.display} ({exc})")
 
     if topic.hn_keywords:
         try:
