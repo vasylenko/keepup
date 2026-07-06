@@ -68,18 +68,20 @@ Seed sources (M1):
 - AWS: `https://aws.amazon.com/about-aws/whats-new/recent/feed/` filtered by AWS's own tags to secrets management (Secrets Manager), kubernetes (EKS), compute, and serverless
 - Engineering blogs (plain RSS, verbatim list): The Pragmatic Engineer, Simon Willison (`/atom/entries/` — essays, not the linkblog), Will Larson (`lethain.com`)
 
+**Transport** — every HTTP fetch goes through the `markfetch` CLI in `--raw` mode (body on stdout, `[code]` on stderr, non-zero exit); it owns the wire (Chrome fingerprint, HTTP/1.1 to slip Cloudflare's HTTP/2 check, redirects, timeouts). keepup does no HTTP itself and parses everything markfetch returns.
+
 **Fetchers** — one per source type, all emitting `Item{id, title, url, source, published, excerpt}`:
-- **RSS/Atom**: `feedparser`. Covers blogs and GitHub release feeds (`/releases.atom`); an optional per-feed `categories` filter narrows single-feed sites to curated sections.
-- **Sitemap (RSS-less sites)**: discover URLs via the site's `sitemap.xml` (`requests`; filter by `path_prefix`, shortlist by `lastmod`), then fetch each candidate page with the `markfetch` CLI (markdown on stdout, `[code]` on stderr, non-zero exit). `lastmod` never dates an item (modified ≠ published — a redeploy bumps it sitewide): the item's date comes from the page itself (h1-adjacent date in the raw HTML, else the extracted markdown), and pages without one are dropped. The excerpt is the page's own `og:description`/meta description — the publisher's hand-written pitch — falling back to body text.
-- **X (best-effort, M3)**: Nitter-compatible RSS, instance list in config (`xcancel.com` direct + `twiiit.com` redirect discovery), custom User-Agent, per-account tolerance for failure. Adapter interface so a paid API slots in without pipeline changes.
-- **Reddit (M3)**: official OAuth API, free "script" app, plain `requests` against `/r/X/new`.
-- **HN**: Algolia HN Search API — free, no auth, keyword + `created_at_i` week window.
-- **OpenAI release notes**: no RSS; entries are structured rows in the page's Next.js RSC payload (`requests` — its HTTP/1.1 fingerprint passes the edge check that rejects HTTP/2 clients), filtered by `product`.
+- **RSS/Atom**: `feedparser` over the raw feed. Covers blogs and GitHub release feeds (`/releases.atom`); an optional per-feed `categories` filter narrows single-feed sites to curated sections.
+- **Sitemap (RSS-less sites)**: parse the site's `sitemap.xml` (filter by `path_prefix`, shortlist by `lastmod`), then fetch each candidate page's raw HTML. `lastmod` never dates an item (modified ≠ published — a redeploy bumps it sitewide): the date is the h1-adjacent date in the HTML, and pages without one are dropped. Title from `og:title`; excerpt from `og:description`/meta description — the publisher's hand-written pitch.
+- **HN**: Algolia HN Search API — free, no auth, keyword + `created_at_i` week window; JSON parsed from the raw body.
+- **OpenAI release notes**: no RSS; entries are structured rows in the page's Next.js RSC payload, filtered by `product`.
+- **X (best-effort, M3)**: Nitter-compatible RSS, instance list in config. Adapter interface so a paid API slots in without pipeline changes.
+- **Reddit (M3)**: official OAuth API, free "script" app.
 
 Each source has an optional `group` so products roll up under their vendor (Codex, ChatGPT → OpenAI; Claude Code → Anthropic); the render groups by vendor.
 
 **Pipeline** (single Python run):
-1. Fetch all sources, 7-day window by published date (undated items are dropped); per-source timeout; a failing source never fails the run — it's skipped and footnoted.
+1. Fetch all sources (via markfetch), 7-day window by published date (undated items are dropped); a failing source never fails the run — it's skipped and footnoted with markfetch's error code.
 2. Normalize; dedupe by canonical URL (strip tracking params).
 3. Per topic: **select** ≤40 items by newest-first round-robin across sources, so a single high-volume feed can't crowd out the cross-source echoes ranking depends on. One chat-completions call to GitHub Models (OpenAI-compatible, `https://models.github.ai/inference`); excerpt budget derives from the free tier's 8k-in/4k-out per-request cap. LLM failure ⇒ that topic renders links-only. A topic can opt out of synthesis (`synthesize: false`) — its headlines render verbatim, no LLM pass.
 4. Render (Jinja2) into `docs/`: one consistent structure everywhere — topic (h2) → source group (h3) → content. Synthesized topics show ranked stories (headline, why-it-matters, source links); opt-out topics list dated headlines verbatim, optionally with a one-line description from the feed summary; a failed synthesis falls back to the same grouped list. A source with no posts still appears with a "Nothing posted last week." note — silence is information. No JS required for reading. Publish = commit `docs/` to `main`; Pages serves from the branch.
@@ -91,7 +93,7 @@ Each source has an optional `group` so products roll up under their vendor (Code
 
 ## Tech decisions
 
-- Python 3.14, deps: `feedparser`, `requests`, `jinja2`, `pyyaml`, `openai`; plus the `markfetch` CLI (npm) as a subprocess for page→markdown.
+- Python 3.14, deps: `feedparser`, `jinja2`, `pyyaml`, `openai`; plus the `markfetch` CLI (npm) as the subprocess transport for all HTTP fetching (`--raw`).
 - State = the repo, nothing else: rendered weeks are committed (archive + Pages source + schedule keepalive). Week window computed from run date; dedupe within-run.
 - Layout: `keepup/` (package, incl. `prompts/`) · `config/topics.yml` · `templates/` · `docs/` (published site) · `.github/workflows/digest.yml`
 
