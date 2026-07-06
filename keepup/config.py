@@ -70,8 +70,7 @@ class Topic:
     sitemaps: list[SitemapSource] = field(default_factory=list)
     release_notes: list[ReleaseNotesSource] = field(default_factory=list)
     hn_keywords: list[str] = field(default_factory=list)
-    synthesize: bool = True  # False ⇒ no LLM pass, render headlines verbatim
-    descriptions: bool = False  # verbatim lists: one-line description per item
+    descriptions: bool = False  # show a one-line description per item
     buckets: list[str] = field(default_factory=list)  # LLM sorts items into these groups
 
     def group_of(self) -> dict[str, str]:
@@ -121,7 +120,6 @@ def load_config(path: str | Path = "config/topics.yml") -> Config:
                 for r in t.get("release_notes", [])
             ],
             hn_keywords=t.get("hn_keywords", []),
-            synthesize=t.get("synthesize", True),
             descriptions=t.get("descriptions", False),
             buckets=t.get("buckets", []),
         )

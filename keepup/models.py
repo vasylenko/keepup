@@ -24,26 +24,15 @@ class Item:
 
 
 @dataclass
-class Story:
-    """One synthesized digest story; item_ids may only reference fetched Items."""
-
-    headline: str
-    why_it_matters: str
-    item_ids: list[str]
-
-
-@dataclass
 class TopicDigest:
     """Everything the renderer needs for one topic section."""
 
     name: str
     items: list[Item]  # selected items, newest first
-    stories: list[Story] | None  # None ⇒ synthesis failed ⇒ links-only
     failed_sources: list[str] = field(default_factory=list)
-    synthesize: bool = True  # False ⇒ headlines verbatim, by design not by failure
-    descriptions: bool = False  # verbatim lists: one-line description per item
-    groups: list[str] = field(default_factory=list)  # parent-group roster, quiet ones included
-    group_of: dict[str, str] = field(default_factory=dict)  # source display name → parent group
+    descriptions: bool = False  # show a one-line description per item
+    groups: list[str] = field(default_factory=list)  # group roster, quiet ones included
+    group_of: dict[str, str] = field(default_factory=dict)  # source display name → group
 
 
 def canonical_url(url: str) -> str:

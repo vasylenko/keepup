@@ -34,22 +34,14 @@ def render(
     past_weeks = sorted(
         (p.stem for p in archive_dir.glob("*.html") if p.stem != week), reverse=True
     )
-    # Every topic renders topic (h2) → parent group (h3) → content. Child
-    # sources (Codex, Claude Code) roll up under their vendor group; stories
-    # keep LLM rank order within a group.
-    stories_by_vendor: dict[str, dict[str, list]] = {}
+    # Every topic renders topic (h2) → group (h3: vendor, author, or bucket) →
+    # items. Child sources (Codex, Claude Code) roll up under their vendor group.
     items_by_source: dict[str, dict[str, list]] = {}
     for t in digests:
-        by_id = {i.id: i for i in t.items}
 
         def group_for(source: str, mapping=t.group_of) -> str:
             head = source.split(" + ")[0]  # dedupe may join sources
             return mapping.get(head, source)
-
-        story_groups: dict[str, list] = {}
-        for story in t.stories or []:
-            story_groups.setdefault(group_for(by_id[story.item_ids[0]].source), []).append(story)
-        stories_by_vendor[t.name] = story_groups
 
         # Seed groups in roster (config) order so display order is stable, not
         # data-dependent. A group with no items shows a quiet note — unless
@@ -70,8 +62,6 @@ def render(
                 week=week,
                 generated=generated,
                 past_weeks=past_weeks,
-                items_by_id={t.name: {i.id: i for i in t.items} for t in digests},
-                stories_by_vendor=stories_by_vendor,
                 items_by_source=items_by_source,
                 root=root,
             )

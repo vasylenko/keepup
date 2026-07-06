@@ -11,15 +11,13 @@
   :root { color-scheme: light dark; }
   body { max-width: 42rem; margin: 2.5rem auto 4rem; padding: 0 1.25rem;
          font: 17px/1.65 Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif; }
-  h1, h2, h3, h4, .meta, .note, .footnote, .links, header p, footer {
+  h1, h2, h3, .meta, .note, .footnote, header p, footer {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; }
   h1 { font-size: 1.5rem; margin-bottom: 0; }
   h2 { font-size: 1.2rem; margin: 2.8rem 0 .4rem; padding-bottom: .35rem;
        border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent); }
   h3 { font-size: .78rem; font-weight: 600; text-transform: uppercase;
        letter-spacing: .09em; opacity: .6; margin: 1.7rem 0 .5rem; }
-  h4 { font-size: 1.02rem; margin: 1.1rem 0 .15rem; }
-  article p { margin: .15rem 0; }
   ul { padding-left: 1.2rem; margin: .4rem 0; }
   li { margin-bottom: .6rem; }
   a { color: inherit;
@@ -29,8 +27,6 @@
   .meta { opacity: .6; font-size: .8rem; }
   .desc { display: block; opacity: .78; font-size: .93em; }
   .note, .footnote { opacity: .65; font-size: .85rem; }
-  .links { font-size: .8rem; }
-  .links a { margin-right: .8em; }
   footer { margin-top: 3.5rem; font-size: .85rem; opacity: .75; }
   footer a { margin-right: .8em; }
 </style>
@@ -56,37 +52,14 @@
 <section>
   <h2>{{ topic.name }}</h2>
 
-  {% if not topic.synthesize or topic.stories is none %}
-    {% if topic.synthesize and topic.items %}
-    <p class="note">Synthesis unavailable this week — raw links instead.</p>
-    {% endif %}
-    {% for source, items in items_by_source[topic.name].items() %}
-    <h3>{{ source }}</h3>
+  {% for group, items in items_by_source[topic.name].items() %}
+    <h3>{{ group }}</h3>
     {% if items %}
     {{ item_list(items, show_desc=topic.descriptions) }}
     {% else %}
     <p class="note">Nothing posted last week.</p>
     {% endif %}
-    {% endfor %}
-  {% elif not topic.stories %}
-    <p class="note">Quiet week.</p>
-  {% else %}
-    {% for vendor, stories in stories_by_vendor[topic.name].items() %}
-    <h3>{{ vendor }}</h3>
-    {% for story in stories %}
-    <article>
-      <h4>{{ story.headline }}</h4>
-      <p>{{ story.why_it_matters }}</p>
-      <p class="links">
-        {%- for iid in story.item_ids -%}
-        {%- set item = items_by_id[topic.name][iid] -%}
-        <a href="{{ item.url }}" title="{{ item.title }}">{{ item.source }}</a>
-        {%- endfor -%}
-      </p>
-    </article>
-    {% endfor %}
-    {% endfor %}
-  {% endif %}
+  {% endfor %}
 
   {% if topic.failed_sources %}
   <p class="footnote">Sources unavailable this week: {{ topic.failed_sources | join(', ') }}</p>
