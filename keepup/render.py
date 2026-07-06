@@ -40,8 +40,7 @@ def render(
     for t in digests:
 
         def group_for(source: str, mapping=t.group_of) -> str:
-            head = source.split(" + ")[0]  # dedupe may join sources
-            return mapping.get(head, source)
+            return mapping.get(source, source)
 
         # Seed groups in roster (config) order so display order is stable, not
         # data-dependent. A group with no items shows a quiet note — unless

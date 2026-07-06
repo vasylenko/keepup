@@ -13,8 +13,6 @@ def dedupe(items: list[Item]) -> list[Item]:
         if existing is None:
             merged[item.id] = item
             continue
-        if item.source not in existing.source.split(" + "):
-            existing.source += f" + {item.source}"
         if len(item.excerpt) > len(existing.excerpt):
             existing.excerpt = item.excerpt
     return list(merged.values())

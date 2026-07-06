@@ -18,7 +18,7 @@ class Item:
     id: str  # short hash of the canonical URL — the LLM references this
     title: str
     url: str
-    source: str  # origin name; multi-source echoes join with " + "
+    source: str  # display name of the origin; also the render grouping key
     published: datetime  # timezone-aware UTC
     excerpt: str = ""
 
