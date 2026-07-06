@@ -18,7 +18,7 @@ jobs:
       - uses: astral-sh/setup-uv@v7
 
       - name: Install markfetch
-        run: npm install --global markfetch
+        run: npm install --global "markfetch@^0.7.1" # --raw + HTTP/1.1 fetch
 
       - name: Build the digest
         run: uv run python -m keepup
