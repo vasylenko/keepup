@@ -1,10 +1,10 @@
 """Hacker News fetcher — Algolia HN Search API, keyword search in the week window."""
 
+import json
 from datetime import UTC, datetime
+from urllib.parse import urlencode
 
-import requests
-
-from keepup.fetchers.common import TIMEOUT
+from keepup.fetchers.markfetch import fetch_raw
 from keepup.models import Item, make_item
 
 API = "https://hn.algolia.com/api/v1/search_by_date"
@@ -18,18 +18,16 @@ def fetch_keywords(keywords: list[str], since: datetime) -> list[Item]:
     """
     seen: dict[str, Item] = {}
     for kw in keywords:
-        resp = requests.get(
-            API,
-            params={
+        query = urlencode(
+            {
                 "query": kw,
                 "tags": "story",
                 "numericFilters": f"created_at_i>{int(since.timestamp())}",
                 "hitsPerPage": 50,
-            },
-            timeout=TIMEOUT,
+            }
         )
-        resp.raise_for_status()
-        for hit in resp.json()["hits"]:
+        data = json.loads(fetch_raw(f"{API}?{query}"))
+        for hit in data["hits"]:
             hn_id = hit["objectID"]
             if hn_id in seen or not hit.get("title"):
                 continue

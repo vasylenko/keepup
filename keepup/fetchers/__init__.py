@@ -20,13 +20,13 @@ def fetch_topic(topic: Topic, since: datetime) -> tuple[list[Item], list[str]]:
         try:
             items += rss.fetch_feed(feed.url, since, feed.categories, feed.name)
         except Exception as exc:
-            failed.append(f"{feed.display} ({exc.__class__.__name__})")
+            failed.append(f"{feed.display} ({exc})")
 
     for source in topic.sitemaps:
         try:
             items += sitemap.fetch_sitemap(source.url, source.path_prefix, since, source.name)
         except Exception as exc:
-            failed.append(f"{source.display} ({exc.__class__.__name__})")
+            failed.append(f"{source.display} ({exc})")
 
     for source in topic.release_notes:
         try:
@@ -34,12 +34,12 @@ def fetch_topic(topic: Topic, since: datetime) -> tuple[list[Item], list[str]]:
                 source.url, source.products, since, source.display
             )
         except Exception as exc:
-            failed.append(f"{source.display} ({exc.__class__.__name__})")
+            failed.append(f"{source.display} ({exc})")
 
     if topic.hn_keywords:
         try:
             items += hn.fetch_keywords(topic.hn_keywords, since)
         except Exception as exc:
-            failed.append(f"Hacker News ({exc.__class__.__name__})")
+            failed.append(f"Hacker News ({exc})")
 
     return items, failed

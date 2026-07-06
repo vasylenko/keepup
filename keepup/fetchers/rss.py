@@ -6,9 +6,8 @@ from datetime import UTC, datetime
 from urllib.parse import urlsplit
 
 import feedparser
-import requests
 
-from keepup.fetchers.common import CHROME_UA, TIMEOUT
+from keepup.fetchers.markfetch import fetch_raw
 from keepup.models import Item, make_item
 
 _TAGS = re.compile(r"<[^>]+>")
@@ -24,14 +23,11 @@ def fetch_feed(
 ) -> list[Item]:
     """Fetch one feed and return items published inside the window.
 
-    Fetched via requests (feedparser has no timeout control), then parsed
-    from bytes. Undated entries are dropped — the week window is the product.
-    `categories` narrows firehose feeds (e.g. OpenAI's single rss.xml) to the
-    curated sections; entries carry them as <category> tags.
+    Undated entries are dropped — the week window is the product. `categories`
+    narrows firehose feeds (e.g. OpenAI's single rss.xml) to the curated
+    sections; entries carry them as <category> tags.
     """
-    resp = requests.get(url, headers={"User-Agent": CHROME_UA}, timeout=TIMEOUT)
-    resp.raise_for_status()
-    parsed = feedparser.parse(resp.content)
+    parsed = feedparser.parse(fetch_raw(url))
     if parsed.bozo and not parsed.entries:
         raise RuntimeError(f"unparseable feed: {parsed.bozo_exception}")
 

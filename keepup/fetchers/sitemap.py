@@ -1,18 +1,17 @@
 """Sitemap fetcher for sites without RSS (e.g. anthropic.com).
 
-Two steps: sitemap.xml discovers candidate URLs, the markfetch CLI turns each
-page into markdown for the title, publish date, and excerpt.
+Two steps: sitemap.xml discovers candidate URLs, then each page's raw HTML
+gives the title, publish date, and excerpt — all read directly from the markup
+(Readability would strip the header block where the date lives).
 """
 
+import html as html_entities
 import re
-import subprocess
 import xml.etree.ElementTree as ET
 from datetime import UTC, datetime
 from urllib.parse import urlsplit
 
-import requests
-
-from keepup.fetchers.common import CHROME_UA, TIMEOUT
+from keepup.fetchers.markfetch import fetch_raw
 from keepup.models import Item, make_item
 
 _NS = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
@@ -35,50 +34,34 @@ def _parse_date(text: str) -> datetime | None:
 def _h1_date(html: str) -> datetime | None:
     """Publish date rendered next to the page's h1 (anthropic.com style).
 
-    Read from raw HTML because Readability strips the title header block,
-    so the date never survives into markfetch's markdown.
+    A page with no findable date is dropped, not dated by lastmod — trusting
+    lastmod resurfaces years-old posts after a site redeploy.
     """
     match = re.search(r"</h1>.{0,300}?(" + _DATE.pattern + ")", html, re.S)
     return _parse_date(match.group(1)) if match else None
 
 
-def _page_date(markdown: str) -> datetime | None:
-    """Fallback for pages whose extracted body still opens with the date."""
-    match = _DATE.search(markdown[:600])
-    return _parse_date(match.group(0)) if match else None
-
-
-def _meta_description(html: str) -> str:
-    """The publisher's own summary (og:description / meta description) —
-    hand-written to be the one-line pitch, so it beats anything we derive."""
-    import html as html_entities
-
+def _meta(html: str, keys: str) -> str:
+    """First matching <meta> content for any of the given name/property keys."""
     for tag in re.finditer(r"<meta\s[^>]*>", html[:20000], re.I):
-        if not re.search(r"""(?:name|property)=["'](?:og:)?description["']""", tag.group(0), re.I):
+        if not re.search(rf"(?:name|property)=[\"'](?:{keys})[\"']", tag.group(0), re.I):
             continue
-        content = re.search(r"""content=["']([^"']+)""", tag.group(0))
+        content = re.search(r"content=[\"']([^\"']+)", tag.group(0))
         if content:
             return html_entities.unescape(content.group(1)).strip()
     return ""
 
 
-def _markfetch(url: str) -> str | None:
-    """Run the markfetch CLI: markdown on stdout, non-zero exit on failure.
-
-    A missing binary is a source-level failure (raise); a single bad page is
-    not (None) — one broken article must not hide the rest of the week.
-    """
-    result = subprocess.run(
-        ["markfetch", url], capture_output=True, text=True, timeout=60
-    )
-    return result.stdout if result.returncode == 0 else None
+def _title(html: str, fallback: str) -> str:
+    if og := _meta(html, "og:title"):
+        return og
+    match = re.search(r"<title[^>]*>([^<]+)</title>", html, re.I)
+    return html_entities.unescape(match.group(1)).strip() if match else fallback
 
 
 def fetch_sitemap(url: str, path_prefix: str, since: datetime, name: str = "") -> list[Item]:
     """Fetch pages under path_prefix whose content is inside the week window."""
-    resp = requests.get(url, headers={"User-Agent": CHROME_UA}, timeout=TIMEOUT)
-    resp.raise_for_status()
-    root = ET.fromstring(resp.content)
+    root = ET.fromstring(fetch_raw(url))
 
     candidates = []
     for node in root.findall("sm:url", _NS):
@@ -95,29 +78,20 @@ def fetch_sitemap(url: str, path_prefix: str, since: datetime, name: str = "") -
 
     items = []
     for _, loc in candidates[:_MAX_PAGES]:
-        # The page's own date is required; lastmod only shortlists candidates.
-        # Trusting lastmod resurfaces years-old posts after a site redeploy.
-        page = requests.get(loc, headers={"User-Agent": CHROME_UA}, timeout=TIMEOUT)
-        page_html = page.text if page.ok else ""
-        published = _h1_date(page_html)
-        if published and published < since:
-            continue
-        markdown = _markfetch(loc)
-        if not markdown:
-            continue
-        published = published or _page_date(markdown)
+        try:
+            page = fetch_raw(loc)
+        except RuntimeError:
+            continue  # one broken article must not hide the rest of the week
+        published = _h1_date(page)
         if not published or published < since:
             continue
-        lines = [l.strip() for l in markdown.splitlines() if l.strip()]
-        title = next((l.lstrip("# ") for l in lines if l.startswith("# ")), loc)
-        body = " ".join(l for l in lines if not l.startswith("#"))
         items.append(
             make_item(
-                title=title,
+                title=_title(page, loc),
                 url=loc,
                 source=name or urlsplit(url).netloc.removeprefix("www."),
                 published=published,
-                excerpt=_meta_description(page_html) or body[:500],
+                excerpt=_meta(page, "og:description|description"),
             )
         )
     return items

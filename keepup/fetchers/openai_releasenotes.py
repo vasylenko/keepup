@@ -2,20 +2,15 @@
 
 The page has no RSS. Its entries live in the Next.js RSC flight payload as
 structured rows (product, releaseDate, title, rich-text description, source
-link) — more reliable than scraping the rendered DOM.
-
-Cloudflare here fingerprints HTTP/2: a client whose UA says Chrome but whose
-protocol fingerprint doesn't (curl, markfetch) gets a 403. `requests` speaks
-HTTP/1.1 only, so it sidesteps that check without any spoofing.
+link) — more reliable than scraping the rendered DOM. markfetch fetches the
+raw HTML (its HTTP/1.1 wire slips the Cloudflare block); we parse the payload.
 """
 
 import json
 import re
 from datetime import UTC, date, datetime
 
-import requests
-
-from keepup.fetchers.common import CHROME_UA, TIMEOUT
+from keepup.fetchers.markfetch import fetch_raw
 from keepup.models import Item, make_item
 
 _FLIGHT = re.compile(r'self\.__next_f\.push\(\[1,(".*?")\]\)', re.S)
@@ -86,9 +81,7 @@ def fetch_release_notes(
     url: str, products: list[str], since: datetime, name: str = ""
 ) -> list[Item]:
     """Fetch release-notes entries for the given products inside the window."""
-    resp = requests.get(url, headers={"User-Agent": CHROME_UA}, timeout=TIMEOUT)
-    resp.raise_for_status()
-    rows = _rows(_flight_blob(resp.text))
+    rows = _rows(_flight_blob(fetch_raw(url)))
     if not rows:
         raise RuntimeError("no rows in release-notes payload (page structure changed?)")
 
