@@ -1,4 +1,4 @@
-"""Data shapes passed between pipeline layers — these are the layer contracts."""
+"""Data shapes passed between pipeline layers."""
 
 import hashlib
 import re

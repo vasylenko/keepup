@@ -32,11 +32,7 @@ def _parse_date(text: str) -> datetime | None:
 
 
 def _h1_date(html: str) -> datetime | None:
-    """Publish date rendered next to the page's h1 (anthropic.com style).
-
-    A page with no findable date is dropped, not dated by lastmod — trusting
-    lastmod resurfaces years-old posts after a site redeploy.
-    """
+    """Publish date rendered next to the page's h1 (anthropic.com style)."""
     match = re.search(r"</h1>.{0,300}?(" + _DATE.pattern + ")", html, re.S)
     return _parse_date(match.group(1)) if match else None
 

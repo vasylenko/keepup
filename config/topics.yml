@@ -13,10 +13,10 @@ topics:
         categories: [Engineering, Product]
       - url: https://developers.openai.com/codex/changelog/rss.xml
         name: Codex changelog
-        group: OpenAI # Codex is an OpenAI product
+        group: OpenAI
       - url: https://code.claude.com/docs/en/whats-new/rss.xml
         name: Claude Code
-        group: Anthropic # Claude Code is an Anthropic product
+        group: Anthropic
     sitemaps: # Anthropic has no RSS
       - url: https://www.anthropic.com/sitemap.xml
         path_prefix: /news/
@@ -41,9 +41,8 @@ topics:
         name: Will Larson
 
   - name: Cloud (AWS)
-    # AWS's marchitecture areas set the universe; the LLM sorts each item into
-    # a bucket by what it's about (Security wins cross-cutting cases like
-    # GuardDuty-on-EKS, which AWS tags under both security and containers).
+    # Buckets, not source groups: the LLM sorts each item by what it's about,
+    # which AWS's overlapping marchitecture tags can't resolve.
     buckets: [Containers, Security, Compute]
     feeds:
       - url: https://aws.amazon.com/about-aws/whats-new/recent/feed/

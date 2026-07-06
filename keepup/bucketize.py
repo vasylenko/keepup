@@ -1,5 +1,5 @@
 """Bucketize layer: sort a topic's verbatim items into named buckets via one
-LLM classification call. The LLM only *sorts* — item text stays verbatim.
+LLM classification call.
 
 Cross-cutting buckets (e.g. Security spanning EKS/EC2) are why this is an LLM
 call and not a tag rule: the bucket depends on what an item is *about*, which
@@ -22,7 +22,7 @@ def bucketize(topic_name: str, items: list[Item], buckets: list[str], model: str
     roster (display order) on success, or None to fall back to flat grouping.
 
     Unclassified or invalidly-labelled items land in the last bucket — a safe
-    default that keeps the three-bucket skeleton stable every week.
+    default that keeps the bucket set stable every week.
     """
     if not items:
         return buckets

@@ -1,9 +1,8 @@
 """OpenAI release-notes fetcher (openai.com/products/release-notes).
 
 The page has no RSS. Its entries live in the Next.js RSC flight payload as
-structured rows (product, releaseDate, title, rich-text description, source
-link) — more reliable than scraping the rendered DOM. markfetch fetches the
-raw HTML (its HTTP/1.1 wire slips the Cloudflare block); we parse the payload.
+structured rows — more reliable than scraping the rendered DOM, which we parse
+from the raw HTML.
 """
 
 import json

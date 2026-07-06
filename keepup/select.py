@@ -2,15 +2,11 @@
 
 from keepup.models import Item
 
-CAP = 40  # sized so ~300-char excerpts fit the LLM's 8k-token input budget
+CAP = 40  # max items per topic section
 
 
 def dedupe(items: list[Item]) -> list[Item]:
-    """Merge items sharing a canonical URL into one, keeping the echo visible.
-
-    The merged item joins source names ("OpenAI + Hacker News") — that echo is
-    the significance signal the ranker is told to reward.
-    """
+    """Merge items sharing a canonical URL into one, keeping the longer excerpt."""
     merged: dict[str, Item] = {}
     for item in sorted(items, key=lambda i: i.published):
         existing = merged.get(item.id)
@@ -26,7 +22,7 @@ def dedupe(items: list[Item]) -> list[Item]:
 
 def select(items: list[Item], cap: int = CAP) -> list[Item]:
     """Newest-first round-robin across sources, so one high-volume feed can't
-    crowd out the cross-source echoes ranking depends on."""
+    crowd lower-volume sources out of the cap."""
     groups: dict[str, list[Item]] = {}
     for item in items:
         groups.setdefault(item.source, []).append(item)

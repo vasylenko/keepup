@@ -3,8 +3,8 @@
 markfetch owns the wire — Chrome fingerprint, HTTP/1.1 (which slips the
 Cloudflare HTTP/2 fingerprint check), redirects, timeouts. keepup only parses.
 `--raw` returns the response body verbatim, bypassing markfetch's Readability
-extraction and content-type gate, so feeds, sitemaps, API JSON, and HTML all
-come back as-is for a keepup-side parser.
+extraction and content-type gate, so any content type comes back as-is for a
+keepup-side parser.
 """
 
 import re

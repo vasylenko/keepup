@@ -21,9 +21,8 @@ def main() -> None:
         raw, failed = fetch_topic(topic, since)
         selected = select(dedupe(raw))
 
-        # Buckets, when configured, replace source-grouping: the LLM sorts items
-        # into the buckets (mutating item.source); a failed call leaves source
-        # groups intact so the section degrades to the flat source list.
+        # Buckets, when configured, replace source-grouping; a failed
+        # classification keeps the source groups (the walrus short-circuits).
         groups, group_of = topic.group_roster(), topic.group_of()
         bucketed = False
         if topic.buckets and (roster := bucketize(topic.name, selected, topic.buckets, cfg.model)):

@@ -13,8 +13,7 @@ API = "https://hn.algolia.com/api/v1/search_by_date"
 def fetch_keywords(keywords: list[str], since: datetime) -> list[Item]:
     """One API call per keyword; stories deduped across keywords by HN id.
 
-    Points/comments go into the excerpt — community traction is exactly the
-    significance signal the ranker looks for.
+    Points/comments go into the excerpt so the digest shows each story's HN traction.
     """
     seen: dict[str, Item] = {}
     for kw in keywords:
