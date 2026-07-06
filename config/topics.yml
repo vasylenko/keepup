@@ -43,12 +43,15 @@ topics:
         name: Will Larson
 
   - name: Cloud (AWS)
-    synthesize: false # AWS headlines are self-explanatory — list them verbatim
+    synthesize: false # headlines stay verbatim; the LLM only sorts them
+    # AWS's marchitecture areas set the universe; the LLM sorts each item into
+    # a bucket by what it's about (Security wins cross-cutting cases like
+    # GuardDuty-on-EKS, which AWS tags under both security and containers).
+    buckets: [Containers, Security, Compute]
     feeds:
       - url: https://aws.amazon.com/about-aws/whats-new/recent/feed/
         name: AWS What's New # the feed titles itself "Recent Announcements"
         categories:
-          - general:products/aws-secrets-manager
-          - general:products/amazon-eks
+          - marketing:marchitecture/containers
           - marketing:marchitecture/compute
-          - marketing:marchitecture/serverless
+          - marketing:marchitecture/security-identity-and-compliance
