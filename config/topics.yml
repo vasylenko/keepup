@@ -4,7 +4,6 @@ llm:
 
 topics:
   - name: AI/LLM tooling
-    synthesize: false # publisher-written descriptions beat LLM rewrites
     descriptions: true
     feeds:
       - url: https://openai.com/news/rss.xml
@@ -32,7 +31,6 @@ topics:
         group: OpenAI
 
   - name: Engineering blogs
-    synthesize: false # no LLM pass; feed summaries provide the one-liners
     descriptions: true
     feeds:
       - url: https://newsletter.pragmaticengineer.com/feed
@@ -43,7 +41,6 @@ topics:
         name: Will Larson
 
   - name: Cloud (AWS)
-    synthesize: false # headlines stay verbatim; the LLM only sorts them
     # AWS's marchitecture areas set the universe; the LLM sorts each item into
     # a bucket by what it's about (Security wins cross-cutting cases like
     # GuardDuty-on-EKS, which AWS tags under both security and containers).
@@ -55,3 +52,4 @@ topics:
           - marketing:marchitecture/containers
           - marketing:marchitecture/compute
           - marketing:marchitecture/security-identity-and-compliance
+          - general:products/aws-secrets-manager # AWS tags this without a marchitecture area
