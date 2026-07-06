@@ -24,7 +24,6 @@ jobs:
         run: uv run python -m keepup
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }} # X API pay-per-use; unset ⇒ X section footnotes as failed
 
       - name: Commit the week
         run: |

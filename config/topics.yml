@@ -41,8 +41,8 @@ topics:
         name: Will Larson
 
   - name: X threads
-    # Original posts + thread heads per author; retweets and replies are
-    # excluded in the fetcher. Needs X_BEARER_TOKEN (paid API, per-read billing).
+    # Original posts + thread heads per author; retweets and thread
+    # continuations are dropped in the fetcher (nitter.net RSS via markfetch).
     x_accounts:
       - handle: karpathy
         name: Andrej Karpathy
@@ -52,7 +52,7 @@ topics:
         name: ClaudeDevs
       - handle: addyosmani
         name: Addy Osmani
-      - handle: dhh
+      - handle: DHH # lowercase gets an empty 200 from nitter's cold cache
         name: DHH
       - handle: mitchellh
         name: Mitchell Hashimoto

@@ -13,7 +13,7 @@ from keepup.models import Item, make_item
 _TAGS = re.compile(r"<[^>]+>")
 
 
-def _clean(text: str, limit: int = 500) -> str:
+def strip_html(text: str, limit: int = 500) -> str:
     """Feed summaries arrive as HTML; the pipeline works in plain text."""
     return " ".join(html.unescape(_TAGS.sub(" ", text)).split())[:limit]
 
@@ -55,7 +55,7 @@ def fetch_feed(
                 url=entry.link,
                 source=source,
                 published=published,
-                excerpt=_clean(entry.get("summary", "")),
+                excerpt=strip_html(entry.get("summary", "")),
             )
         )
     return items

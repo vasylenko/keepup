@@ -8,10 +8,8 @@ dependencies = [
     "jinja2>=3.1",
     "pyyaml>=6.0",
     "openai>=1.50",
-    "tweepy>=4.17.0",
 ]
-# All HTTP fetching goes through the markfetch CLI (npm), not a Python client —
-# except X: no unauthenticated access exists, so tweepy talks to the paid API.
+# All HTTP fetching goes through the markfetch CLI (npm), not a Python client.
 
 # Plain script package: run with `uv run python -m keepup`, nothing to build.
 [tool.uv]
