@@ -72,6 +72,7 @@ class Topic:
     hn_keywords: list[str] = field(default_factory=list)
     synthesize: bool = True  # False ⇒ no LLM pass, render headlines verbatim
     descriptions: bool = False  # verbatim lists: one-line description per item
+    buckets: list[str] = field(default_factory=list)  # LLM sorts items into these groups
 
     def group_of(self) -> dict[str, str]:
         """Map each source's display name to its parent group (for rendering)."""
@@ -122,6 +123,7 @@ def load_config(path: str | Path = "config/topics.yml") -> Config:
             hn_keywords=t.get("hn_keywords", []),
             synthesize=t.get("synthesize", True),
             descriptions=t.get("descriptions", False),
+            buckets=t.get("buckets", []),
         )
         for t in raw["topics"]
     ]

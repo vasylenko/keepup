@@ -2,6 +2,7 @@
 
 from datetime import UTC, datetime, timedelta
 
+from keepup.bucketize import bucketize
 from keepup.config import load_config
 from keepup.fetchers import fetch_topic
 from keepup.models import TopicDigest
@@ -21,8 +22,17 @@ def main() -> None:
         raw, failed = fetch_topic(topic, since)
         selected = select(dedupe(raw))
         stories = synthesize(topic.name, selected, cfg.model) if topic.synthesize else None
+
+        # Buckets, when configured, replace source-grouping: the LLM sorts items
+        # into the buckets (mutating item.source); a failed call leaves source
+        # groups intact so the section degrades to a flat list.
+        groups, group_of = topic.group_roster(), topic.group_of()
+        bucketed = False
+        if topic.buckets and (roster := bucketize(topic.name, selected, topic.buckets, cfg.model)):
+            groups, group_of, bucketed = roster, {b: b for b in roster}, True
+
         if not topic.synthesize:
-            outcome = "verbatim headlines"
+            outcome = f"{len(groups)} buckets" if bucketed else "verbatim headlines"
         elif stories is None:
             outcome = "links-only"
         else:
@@ -37,8 +47,8 @@ def main() -> None:
                 failed,
                 topic.synthesize,
                 topic.descriptions,
-                topic.group_roster(),
-                topic.group_of(),
+                groups,
+                group_of,
             )
         )
 

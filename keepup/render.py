@@ -51,15 +51,13 @@ def render(
             story_groups.setdefault(group_for(by_id[story.item_ids[0]].source), []).append(story)
         stories_by_vendor[t.name] = story_groups
 
-        item_groups: dict[str, list] = {}
+        # Seed groups in roster (config) order so display order is stable, not
+        # data-dependent. A group with no items shows a quiet note — unless
+        # every source in it failed, which the footnote already covers.
+        failed_groups = {group_for(f.split(" (")[0]) for f in t.failed_sources}
+        item_groups: dict[str, list] = {g: [] for g in t.groups if g not in failed_groups}
         for item in t.items:  # already newest-first
             item_groups.setdefault(group_for(item.source), []).append(item)
-        # A group with no items still appears with a quiet note — unless every
-        # source in it failed, which the footnote already covers.
-        failed_groups = {group_for(f.split(" (")[0]) for f in t.failed_sources}
-        for group in t.groups:
-            if group not in item_groups and group not in failed_groups:
-                item_groups[group] = []
         items_by_source[t.name] = item_groups
     env = Environment(loader=FileSystemLoader(templates), autoescape=select_autoescape())
     env.filters["first_sentence"] = first_sentence
