@@ -17,8 +17,8 @@ def main() -> None:
     # Monday 07:00 cron or a Sunday retry — covers exactly the same seven days.
     monday = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
     since, until = monday - timedelta(days=7), monday
-    week = f"{now:%G}-W{now:%V}"  # ISO week names the archive page
-    covers = f"W{now:%V} {since:%b %d}-{until - timedelta(days=1):%b %d}"
+    week = f"{since:%G}-W{since:%V}"  # the covered ISO week names the archive page
+    covers = f"W{since:%V} {since:%b %d}-{until - timedelta(days=1):%b %d}"
 
     digests = []
     for topic in cfg.topics:
