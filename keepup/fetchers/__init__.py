@@ -11,8 +11,13 @@ from keepup.fetchers import hn, openai_releasenotes, rss, sitemap, x
 from keepup.models import Item
 
 
-def fetch_topic(topic: Topic, since: datetime) -> tuple[list[Item], list[str]]:
-    """Run every configured source for one topic, isolating failures."""
+def fetch_topic(topic: Topic, since: datetime, until: datetime) -> tuple[list[Item], list[str]]:
+    """Run every configured source for one topic, isolating failures.
+
+    Fetchers cut off the past themselves (that bounds what they download);
+    the future edge is cut once here, so a midweek run can't leak
+    current-week items into last week's digest.
+    """
     items: list[Item] = []
     failed: list[str] = []
 
@@ -44,8 +49,8 @@ def fetch_topic(topic: Topic, since: datetime) -> tuple[list[Item], list[str]]:
 
     if topic.hn_keywords:
         try:
-            items += hn.fetch_keywords(topic.hn_keywords, since)
+            items += hn.fetch_keywords(topic.hn_keywords, since, until)
         except Exception as exc:
             failed.append(f"Hacker News ({exc})")
 
-    return items, failed
+    return [item for item in items if item.published < until], failed

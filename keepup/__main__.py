@@ -13,12 +13,16 @@ from keepup.select import dedupe, select
 def main() -> None:
     cfg = load_config()
     now = datetime.now(UTC)
-    since = now - timedelta(days=7)
+    # The window is the previous ISO week, so every run inside week N — the
+    # Monday 07:00 cron or a Sunday retry — covers exactly the same seven days.
+    monday = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+    since, until = monday - timedelta(days=7), monday
     week = f"{now:%G}-W{now:%V}"  # ISO week names the archive page
+    covers = f"W{now:%V} {since:%b %d}-{until - timedelta(days=1):%b %d}"
 
     digests = []
     for topic in cfg.topics:
-        raw, failed = fetch_topic(topic, since)
+        raw, failed = fetch_topic(topic, since, until)
         selected = select(dedupe(raw))
 
         # Buckets, when configured, replace source-grouping; a failed
@@ -33,7 +37,7 @@ def main() -> None:
         print(f"{topic.name}: {len(raw)} fetched → {outcome}{note}")
         digests.append(TopicDigest(topic.name, selected, failed, topic.descriptions, groups, group_of))
 
-    render(digests, week, now)
+    render(digests, week, covers, now)
     print(f"rendered docs/index.html + docs/archive/{week}.html")
 
 

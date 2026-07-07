@@ -45,7 +45,7 @@
 <body>
 <header>
   <h1>keepup</h1>
-  <p class="meta">Week {{ week }} · generated {{ generated.strftime('%b %d, %Y %H:%M UTC') }}</p>
+  <p class="meta">{{ covers }} · generated {{ generated.strftime('%b %d, %Y %H:%M UTC') }}</p>
 </header>
 
 {% for topic in digests %}

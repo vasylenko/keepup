@@ -23,6 +23,7 @@ def first_sentence(text: str, limit: int = 220) -> str:
 def render(
     digests: list[TopicDigest],
     week: str,
+    covers: str,
     generated: datetime,
     docs: str | Path = "docs",
     templates: str | Path = "templates",
@@ -59,6 +60,7 @@ def render(
             template.render(
                 digests=digests,
                 week=week,
+                covers=covers,
                 generated=generated,
                 past_weeks=past_weeks,
                 items_by_source=items_by_source,

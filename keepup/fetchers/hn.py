@@ -10,10 +10,13 @@ from keepup.models import Item, make_item
 API = "https://hn.algolia.com/api/v1/search_by_date"
 
 
-def fetch_keywords(keywords: list[str], since: datetime) -> list[Item]:
+def fetch_keywords(keywords: list[str], since: datetime, until: datetime) -> list[Item]:
     """One API call per keyword; stories deduped across keywords by HN id.
 
-    Points/comments go into the excerpt so the digest shows each story's HN traction.
+    Points/comments go into the excerpt so the digest shows each story's HN
+    traction. The window's future edge is applied server-side too — on a
+    late-week run, current-week stories would otherwise crowd last week's
+    out of the 50-hit page.
     """
     seen: dict[str, Item] = {}
     for kw in keywords:
@@ -21,7 +24,10 @@ def fetch_keywords(keywords: list[str], since: datetime) -> list[Item]:
             {
                 "query": kw,
                 "tags": "story",
-                "numericFilters": f"created_at_i>{int(since.timestamp())}",
+                "numericFilters": (
+                    f"created_at_i>{int(since.timestamp())},"
+                    f"created_at_i<{int(until.timestamp())}"
+                ),
                 "hitsPerPage": 50,
             }
         )
