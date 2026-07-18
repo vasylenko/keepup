@@ -1,8 +1,6 @@
 name: weekly digest
 
 on:
-  schedule:
-    - cron: "0 5 * * 1" # Monday morning, before the coffee
   workflow_dispatch:
 
 permissions:
